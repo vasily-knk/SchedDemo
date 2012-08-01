@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "schedscene.h"
 #include "scheditem.h"
+#include "scheddemo.h"
 
-void planes_task(float timespan, task_t &t);
 
 
 cost_t calculate_cost(const task_t &task, const perm_t &perm)
@@ -55,26 +55,13 @@ int main(int argc, char *argv[])
     }
     std::swap(perm[0], perm[1]);*/
 
-    const size_t N = 10;
-    const moment_t timespan = 300;
-
-    task_t task(N);
-    planes_task(timespan, task);
-
-    perm_t perm(N);
-    sched_t sched(N);
-
-    for (size_t i = 0; i < N; ++i)
-        perm[i] = i;
-
-    perm = random_solver(task, perm, 10000);
-
-    perm2sched(task, perm, sched);
-
-
     QApplication app(argc, argv);
 
-    QWidget *gridGroupBox = new QWidget();
+	SchedDemo demo;
+	demo.show();
+	
+	return app.exec();
+    /*QWidget *gridGroupBox = new QWidget();
 
     QGridLayout *layout = new QGridLayout;
     SchedScene scene (&task, &perm, &sched);
@@ -97,9 +84,8 @@ int main(int argc, char *argv[])
 
 
     gridGroupBox->show();
-    gridGroupBox->setWindowTitle("Sched");
+    gridGroupBox->setWindowTitle("Sched");*/
 
-    return app.exec();
 }
 
 

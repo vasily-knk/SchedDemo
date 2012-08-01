@@ -15,8 +15,10 @@ using boost::mt19937;
 using boost::random::uniform_real_distribution;
 using boost::random::uniform_int_distribution;
 
+#include <boost/function.hpp>
 
 #include <cmath>
 
 #include "task.h"
+
 

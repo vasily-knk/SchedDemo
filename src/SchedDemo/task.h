@@ -13,12 +13,40 @@ struct job_t
 };
 
 
-typedef vector<size_t> perm_t;
+struct perm_t : vector<moment_t> 
+{
+	perm_t(size_t n)
+		: vector<moment_t>(n)
+	{
+		for (iterator it = begin(); it != end(); ++it)
+			*it = (it - begin());
+	}
+};
 
-typedef vector<job_t> task_t;
+
+struct task_t : vector<job_t>
+{
+	task_t(size_t n)
+		: vector<job_t>(n)
+	{
+		for (iterator it = begin(); it != end(); ++it)
+			it->spans.resize(n);
+	}
+};
+
 typedef vector<moment_t> sched_t;
 
+/*struct sched_t : vector<moment_t> 
+{
+	sched_t(size_t n)
+		: vector<moment_t>(n)
+	{
+		for (iterator it = begin(); it != end(); ++it)
+			*it = (it - begin());
+	}
+};
 
+*/
 
 
 void perm2sched(const task_t &task, const perm_t &perm, sched_t &out);
