@@ -82,7 +82,6 @@ int main(int argc, char *argv[])
     QGraphicsView *view = new QGraphicsView(&scene);
     view->setMouseTracking(true);
 
-
     gridGroupBox->setLayout(layout);
 
     QWidget *btnBox = new QWidget();
