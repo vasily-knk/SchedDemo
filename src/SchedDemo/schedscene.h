@@ -38,6 +38,13 @@ public:
     size_t job2item(size_t job) const;
     qreal getItemWidth(size_t item) const;
 
+	
+	typedef boost::function<void()> cost_clb_t;
+	void setCostCallback(const cost_clb_t &clb)
+	{
+		cost_clb_ = clb;
+	}
+
 private:
     void updateItems();
     void updateCost();
@@ -51,6 +58,8 @@ private:
     QGraphicsItem *marker;
 
     QGraphicsRectItem *tRect_;
+
+	cost_clb_t cost_clb_;
 };
 
 #endif // SCHEDSCENE_H

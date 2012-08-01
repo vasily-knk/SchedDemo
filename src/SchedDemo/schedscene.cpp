@@ -200,6 +200,7 @@ void SchedScene::updateItems()
 
 void SchedScene::updateCost()
 {
-    qDebug() << "Cost: " << get_cost(*task_, *sched_);
+	if (cost_clb_ != NULL)
+		cost_clb_();
 }
 

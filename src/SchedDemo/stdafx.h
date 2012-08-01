@@ -16,6 +16,7 @@ using boost::random::uniform_real_distribution;
 using boost::random::uniform_int_distribution;
 
 #include <boost/function.hpp>
+#include <boost/bind.hpp>
 
 #include <cmath>
 

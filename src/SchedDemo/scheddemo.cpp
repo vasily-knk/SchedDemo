@@ -23,6 +23,9 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
 
 	SchedScene *scene = new SchedScene(&task_, &perm_, &sched_);
 	
+	auto clb = boost::bind(&SchedDemo::updateCost, this);
+	scene->setCostCallback(clb);
+	
 	QGraphicsView *view = new QGraphicsView(scene);
 	view->setMouseTracking(true);
 
@@ -35,4 +38,11 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
 SchedDemo::~SchedDemo()
 {
 
+}
+
+void SchedDemo::updateCost()
+{
+	const cost_t cost = get_cost(task_, sched_);
+	const QString text = QString("Cost: %1").arg(cost);
+	setWindowTitle(text);
 }

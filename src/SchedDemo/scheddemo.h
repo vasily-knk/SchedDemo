@@ -11,6 +11,8 @@ public:
 	SchedDemo(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~SchedDemo();
 
+	void updateCost();
+
 private:
 	task_t task_;
 	perm_t perm_;
