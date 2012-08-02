@@ -29,6 +29,7 @@ void Marker::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
 }
 
 
+
 SchedScene::SchedScene(task_t *task, perm_t *perm, sched_t *sched, QObject *parent)
     : QGraphicsScene(parent)
     , task_(task)
@@ -172,9 +173,6 @@ void SchedScene::showTRect(size_t item)
     else
         tRect_->setVisible(false);
 
-
-
-	
 	lbLines_[item]->setPen(thickLine);
 	dueLines_[item]->setPen(thickLine);
 
