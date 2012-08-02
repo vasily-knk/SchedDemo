@@ -100,8 +100,8 @@ void SchedScene::keyPressEvent(QKeyEvent *keyEvent)
     {
         *perm_ = random_solver(*task_, *perm_, 10000);
 
-        invalidateItems();
         updateCost();
+        invalidateItems();
     }
 }
 
@@ -136,8 +136,8 @@ void SchedScene::swapItems(size_t i, size_t j)
         jobs_[j-1]->updateData(getItemWidth(j-1));
 */
 
-    invalidateItems();
     updateCost();
+    invalidateItems();
 }
 
 void SchedScene::selectItem(size_t i)
