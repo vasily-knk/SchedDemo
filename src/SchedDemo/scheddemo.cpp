@@ -11,6 +11,8 @@ void planes_task(float timespan, task_t &t);
 
 perm_t due_dates_solver(const task_t &t, const perm_t &src);
 perm_t random_solver(const task_t &t, const perm_t &src, size_t n_iters);
+perm_t all_pairs_solver(const task_t &t, const perm_t &src);
+perm_t annealing_solver(const task_t &t, const perm_t &src);
 
 SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
 	: QWidget(parent, flags)
@@ -34,13 +36,15 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
 	
 	QGraphicsView *view = new QGraphicsView(scene_);
 	view->setMouseTracking(true);
+    
 	//view->setRenderHint(QPainter::Antialiasing);
 
 
 
     solver_slots_.push_back(solver_slot_t("Due dates", due_dates_solver));
-    solver_slots_.push_back(solver_slot_t("Random pairs", boost::bind(random_solver, _1, _2, 10000)));
-    solver_slots_.push_back(solver_slot_t("Best pair", NULL));
+    solver_slots_.push_back(solver_slot_t("Random pair", boost::bind(random_solver, _1, _2, 10000)));
+    solver_slots_.push_back(solver_slot_t("Best pair", all_pairs_solver));
+    solver_slots_.push_back(solver_slot_t("Annealing", annealing_solver));
 
     QGridLayout *layout = new QGridLayout;
 

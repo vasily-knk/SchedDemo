@@ -233,11 +233,16 @@ void SchedScene::updateCost()
 
 void SchedScene::invalidateItems()
 {
+    vector<cost_t> tards(jobs_.size());
+
+
     for (size_t i = 0; i < jobs_.size(); ++i)
     {
         const size_t job_i = (*perm_)[i];
+
+        tards[i] = std::max<cost_t>((*sched_)[job_i] - (*task_)[job_i].due, 0) * (*task_)[job_i].tweight;
         
-        qreal width = 5;
+        qreal width = 5; // FIXME
 
         if (i < jobs_.size() - 1)
         {
@@ -247,6 +252,17 @@ void SchedScene::invalidateItems()
         
         jobs_[i]->updateData(width, weight2coord((*task_)[job_i].tweight));
     }
+    const cost_t max_tard = *std::max_element(tards.begin(), tards.end());
+
+    for (size_t i = 0; i < tards.size(); ++i)
+    {
+        float ratio = tards[i] / max_tard;
+        int green = std::min(static_cast<int>(255.0 * 2.0 * (1.0 - ratio)), 255);
+        int red = std::min(static_cast<int>(255.0 * 2.0 * ratio), 255);
+
+        jobs_[i]->setColor(QColor(red, green, 0));
+    }
+
 
     updateItems();
 }

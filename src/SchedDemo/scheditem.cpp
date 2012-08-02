@@ -25,9 +25,9 @@ void SchedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    QColor color(Qt::green);
+    QColor color(color_);
     if (scene_->selected_.is_initialized() && *(scene_->selected_) == id_)
-        color = Qt::red;
+        color = Qt::blue;
 
     painter->setPen(QPen(Qt::black, 1));
     painter->setBrush(QBrush(color));

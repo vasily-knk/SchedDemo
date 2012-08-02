@@ -13,6 +13,10 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     void updateData(qreal width, qreal height);
+    void setColor(QColor color)
+    {
+        color_ = color;
+    }
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -27,6 +31,7 @@ private:
 
     qreal width_;
     qreal height_;
+    QColor color_;
 
     bool is_dragged_;
 };

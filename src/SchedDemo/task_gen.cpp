@@ -14,9 +14,9 @@ float get_class_wait(plane_class i, plane_class j)
     else
     {
         if (j == HEAVY)
-            return 1;
-        else
             return 2;
+        else
+            return 3;
     }
 
 }
@@ -68,7 +68,7 @@ void planes_task(float timespan, task_t &t)
     {
         t[i].due = dates_distr(randgen);
         t[i].min_bound = t[i].due;
-        t[i].tweight = .2 + classes_distr(randgen) * .8;
+        t[i].tweight = .2 + classes_distr(randgen) * 1.8;
     }
 
 

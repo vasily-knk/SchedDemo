@@ -44,6 +44,96 @@ perm_t random_solver(const task_t &t, const perm_t &src, size_t n_iters)
     return dst;
 }
 
+perm_t all_pairs_solver(const task_t &t, const perm_t &src)
+{
+    perm_t dst (src);
+    cost_t orig_cost = calculate_cost(t, src);
+
+
+    size_t best_i = 0, best_j = 0;
+    cost_t best_cost = orig_cost + 1;
+
+    bool success = true;
+    int iter;
+    for (iter = 0; success; ++iter)
+    {
+        success = false;
+        for (size_t i = 0; i < t.size()/* && !success*/; ++i)
+        {
+            for (size_t j = i + 1; j < t.size()/* && !success*/; ++j)
+            {
+                cost_t before = calculate_cost(t, dst);
+                std::swap(dst[i], dst[j]);
+                cost_t after = calculate_cost(t, dst);
+
+                if (after < best_cost)
+                {
+                    best_i = i;
+                    best_j = j;
+                    best_cost = after;
+                    success = true;
+                }
+
+                std::swap(dst[i], dst[j]);
+
+/*                if (after >= before)
+                    std::swap(dst[i], dst[j]);
+                else
+                    success = true;*/
+            }
+        }
+
+        if (success)
+            std::swap(dst[best_i], dst[best_j]);
+
+        //cout << " iter " << iter << ", cost " << best_cost << endl;
+    } 
+
+    return dst;        
+}
+
+perm_t annealing_solver(const task_t &t, const perm_t &src)
+{
+    typedef mt19937 gen;
+    gen randgen(static_cast<unsigned int>(std::time(0)));
+
+    uniform_real_distribution<float> distr(0, 1);
+
+
+    perm_t dst(src);
+    const float initial = 10000;
+    const float frozen = 0.1;
+    const float cooling = 0.99;
+    const size_t n_iter = 100;
+
+    for (float temperature = initial; temperature > frozen; temperature *= cooling)
+    {
+        for (size_t iter = 0; iter < n_iter; ++iter)
+        {
+            size_t i = rand() % (t.size() - 1);
+            size_t j = i + 1 + rand() % (t.size() - i - 1);
+
+
+            cost_t before = calculate_cost(t, dst);
+            std::swap(dst[i], dst[j]);
+            cost_t after = calculate_cost(t, dst);
+
+            if (after < before)
+                continue;
+
+            // after >= before
+            float p = 1.0f / (1.0f + exp((after - before) / temperature));
+            float h = distr(randgen);
+            if (p > h)
+                continue;
+
+            std::swap(dst[i], dst[j]);
+        }
+    }
+
+    return dst;
+}
+
 
 int main(int argc, char *argv[])
 {
