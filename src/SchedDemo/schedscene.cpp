@@ -34,30 +34,47 @@ SchedScene::SchedScene(task_t *task, perm_t *perm, sched_t *sched, QObject *pare
     , task_(task)
     , perm_(perm)
     , sched_(sched)
-    , items_(task->size())
+    , jobs_(task->size())
     , marker(new Marker)
     , tRect_(NULL)
 
+	, lbLines_ (task->size())
+	, ubLines_ (task->size())
+	, dueLines_(task->size())
+
+	, normalLine(QBrush(Qt::lightGray), 1.0)
+	, thickLine(QBrush(Qt::black), 1.0)
+
+	, weightScale_(1.0)
+	, timeScale_  (1.0)
+
+	, DATES_HEIGHT(0)
+	, JOBS_HEIGHT (100)
+
 {
-    for (size_t i = 0; i < task->size(); ++i)
-    {
-        items_[i] = new SchedItem(this, i);
-        items_[i]->setPos(sched->operator[](i), 0);
 
-        addItem(items_[i]);
-        items_[i]->updateData(getItemWidth(i));
-    }
+    //marker->setPos(0, 0);
+    //addItem(marker);
 
-    marker->setPos(0, 0);
-    addItem(marker);
+	for (size_t i = 0; i < task->size(); ++i)
+	{
+		jobs_[i] = new SchedItem(this, i);
+		jobs_[i]->updateData(getItemWidth(i));
+		addItem(jobs_[i]);
 
-    tRect_ = addRect(0, 0, 0, 0);
-    tRect_->setPen(QPen(Qt::red, 1));
-    tRect_->setBrush(QBrush(Qt::red, Qt::Dense5Pattern));
+		lbLines_ [i] = addLine(QLineF(), normalLine);
+		ubLines_ [i] = NULL;
+		dueLines_[i] = addLine(QLineF(), normalLine);
+	}
 
+	tRect_ = addRect(0, 0, 0, 0);
+	tRect_->setPen(QPen(Qt::red, 1));
+	tRect_->setBrush(QBrush(Qt::red, Qt::Dense5Pattern));
 
-    updateItems();
-    updateCost();
+	datesTimeline_ = addLine(QLineF());
+	jobsTimeline_ = addLine(QLineF());
+
+	updateItems();
 }
 
 void SchedScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -83,11 +100,11 @@ void SchedScene::keyPressEvent(QKeyEvent *keyEvent)
     if (keyEvent->key() == Qt::Key_Space)
     {
         *perm_ = random_solver(*task_, *perm_, 10000);
-        for (size_t i = 0; i < items_.size(); ++i)
+        for (size_t i = 0; i < jobs_.size(); ++i)
         {
-            items_[i]->updateData(getItemWidth(i));
+            jobs_[i]->updateData(getItemWidth(i));
         }
-        updateItems();
+        //updateItems();
         updateCost();
     }
 }
@@ -114,12 +131,12 @@ void SchedScene::swapItems(size_t i, size_t j)
     std::swap((*perm_)[i], (*perm_)[j]);
 
 
-    items_[i]->updateData(getItemWidth(i));
+    jobs_[i]->updateData(getItemWidth(i));
     if (i > 0)
-        items_[i-1]->updateData(getItemWidth(i-1));
-    items_[j]->updateData(getItemWidth(j));
+        jobs_[i-1]->updateData(getItemWidth(i-1));
+    jobs_[j]->updateData(getItemWidth(j));
     if (j > 0)
-        items_[j-1]->updateData(getItemWidth(j-1));
+        jobs_[j-1]->updateData(getItemWidth(j-1));
 
     updateItems();
     updateCost();
@@ -128,7 +145,7 @@ void SchedScene::swapItems(size_t i, size_t j)
 void SchedScene::selectItem(size_t i)
 {
     selected_.reset(i);
-    invalidate(items_[i]->boundingRect());
+    invalidate(jobs_[i]->boundingRect());
     //items_[i]->updateData();
 }
 
@@ -136,7 +153,7 @@ void SchedScene::deselectItem()
 {
     if (selected_.is_initialized())
     {
-        invalidate(items_[*selected_]->boundingRect());
+        invalidate(jobs_[*selected_]->boundingRect());
         //items_[*selected_]->updateData();
     }
 
@@ -151,19 +168,27 @@ void SchedScene::showTRect(size_t item)
 
     if (tardiness > 0)
     {
-        tRect_->setRect((*task_)[job].due, 0, tardiness, (*task_)[job].tweight);
+        tRect_->setRect(time2coord((*task_)[job].due), JOBS_HEIGHT, time2coord(tardiness), /*JOBS_HEIGHT + */(*task_)[job].tweight);
         tRect_->setVisible(true);
     }
     else
         tRect_->setVisible(false);
 
+
+
+	
+	lbLines_[item]->setPen(thickLine);
+	dueLines_[item]->setPen(thickLine);
+
     //tRect_->update();
 }
 
-void SchedScene::hideTRect()
+void SchedScene::hideTRect(size_t item)
 {
     tRect_->setVisible(false);
-    //tRect_->update();
+
+	lbLines_[item]->setPen(normalLine);
+	dueLines_[item]->setPen(normalLine);
 }
 
 
@@ -190,10 +215,19 @@ qreal SchedScene::getItemWidth(size_t i) const
 
 void SchedScene::updateItems()
 {
-    perm2sched(*task_, *perm_, *sched_);
+	for (size_t i = 0; i < jobs_.size(); ++i)
+	{
+		const size_t index = (*perm_)[i];
+        jobs_[i]->setPos(time2coord((*sched_)[index]), JOBS_HEIGHT);
 
-    for (size_t i = 0; i < items_.size(); ++i)
-        items_[i]->setPos((*sched_)[(*perm_)[i]], 0);
+		lbLines_ [i]->setLine(time2coord((*sched_)[index]), JOBS_HEIGHT, time2coord((*task_)[index].min_bound), DATES_HEIGHT);
+		dueLines_[i]->setLine(time2coord((*sched_)[index]), JOBS_HEIGHT, time2coord((*task_)[index].due),       DATES_HEIGHT);
+	}
+
+	const qreal length = jobs_.back()->pos().x();
+
+	datesTimeline_->setLine(time2coord(0), DATES_HEIGHT, length, DATES_HEIGHT);
+	jobsTimeline_->setLine(time2coord(0), JOBS_HEIGHT, length, JOBS_HEIGHT);
 
     invalidate();
 }

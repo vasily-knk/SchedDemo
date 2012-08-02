@@ -32,7 +32,7 @@ public:
     void deselectItem();
 
     void showTRect(size_t item);
-    void hideTRect();
+    void hideTRect(size_t item);
 
     size_t item2job(size_t item) const;
     size_t job2item(size_t job) const;
@@ -45,19 +45,33 @@ public:
 		cost_clb_ = clb;
 	}
 
+	void updateItems();
 private:
-    void updateItems();
     void updateCost();
-private:
-    task_t *task_;
-    perm_t *perm_;
-    sched_t *sched_;
 
-    vector<SchedItem*> items_;
+	qreal time2coord(moment_t time) const
+	{
+		return time * timeScale_;
+	}
+private:
+    task_t const *task_;
+    perm_t *perm_;
+    sched_t const *sched_;
+
     optional<size_t> selected_;
     QGraphicsItem *marker;
 
     QGraphicsRectItem *tRect_;
+
+	QGraphicsLineItem *datesTimeline_, *jobsTimeline_;
+	vector<QGraphicsLineItem*> lbLines_, ubLines_, dueLines_;
+	vector<SchedItem*> jobs_;
+
+	const QPen normalLine, thickLine;
+
+	qreal weightScale_, timeScale_;
+
+	const qreal DATES_HEIGHT, JOBS_HEIGHT;
 
 	cost_clb_t cost_clb_;
 };

@@ -87,5 +87,5 @@ void SchedItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 
 void SchedItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
-    scene_->hideTRect();
+    scene_->hideTRect(id_);
 }

@@ -21,13 +21,14 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
 	planes_task(timespan, task_);
 	perm2sched(task_, perm_, sched_);
 
-	SchedScene *scene = new SchedScene(&task_, &perm_, &sched_);
+	scene_ = new SchedScene(&task_, &perm_, &sched_);
 	
 	auto clb = boost::bind(&SchedDemo::updateCost, this);
-	scene->setCostCallback(clb);
+	scene_->setCostCallback(clb);
 	
-	QGraphicsView *view = new QGraphicsView(scene);
+	QGraphicsView *view = new QGraphicsView(scene_);
 	view->setMouseTracking(true);
+	//view->setRenderHint(QPainter::Antialiasing);
 
 	QGridLayout *layout = new QGridLayout;
 	layout->addWidget(view);
@@ -42,6 +43,8 @@ SchedDemo::~SchedDemo()
 
 void SchedDemo::updateCost()
 {
+	perm2sched(task_, perm_, sched_);
+	scene_->updateItems();
 	const cost_t cost = get_cost(task_, sched_);
 	const QString text = QString("Cost: %1").arg(cost);
 	setWindowTitle(text);
