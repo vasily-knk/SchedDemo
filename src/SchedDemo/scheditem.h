@@ -12,7 +12,7 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    void updateData(qreal width);
+    void updateData(qreal width, qreal height);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -26,6 +26,7 @@ private:
     size_t id_;
 
     qreal width_;
+    qreal height_;
 
     bool is_dragged_;
 };

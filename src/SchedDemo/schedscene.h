@@ -28,6 +28,8 @@ public:
     void clickItem(size_t id);
     void swapItems(size_t i, size_t j);
 
+    void invalidateItems();
+
     void selectItem(size_t i);
     void deselectItem();
 
@@ -46,13 +48,39 @@ public:
 	}
 
 	void updateItems();
+
+    qreal getWeightScale() const 
+    { 
+        return weightScale_; 
+    }
+    
+    void setWeightScale(qreal val) 
+    { 
+        weightScale_ = val; 
+    }
+    
+    qreal getTimeScale() const 
+    { 
+        return timeScale_; 
+    }
+    void setTimeScale(qreal val) 
+    { 
+        timeScale_ = val; 
+    }
 private:
     void updateCost();
+
+	qreal weight2coord(cost_t weight) const
+	{
+		return weight * weightScale_;
+	}
 
 	qreal time2coord(moment_t time) const
 	{
 		return time * timeScale_;
 	}
+
+
 private:
     task_t const *task_;
     perm_t *perm_;
@@ -71,7 +99,7 @@ private:
 
 	qreal weightScale_, timeScale_;
 
-	const qreal DATES_HEIGHT, JOBS_HEIGHT;
+    const qreal DATES_HEIGHT, JOBS_HEIGHT;
 
 	cost_clb_t cost_clb_;
 };

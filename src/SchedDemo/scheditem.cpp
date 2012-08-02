@@ -17,7 +17,7 @@ QRectF SchedItem::boundingRect() const
 {
     size_t real_id = (*scene_->perm_)[id_];
     const task_t& task = *(scene_->task_);
-    return QRectF(0, 0, width_, task[real_id].tweight);
+    return QRectF(0, 0, width_, height_);
 }
 
 void SchedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -39,9 +39,10 @@ void SchedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
 }
 
-void SchedItem::updateData(qreal proc)
+void SchedItem::updateData(qreal width, qreal height)
 {
-    width_ = proc;
+    width_ = width;
+    height_ = height;
     prepareGeometryChange();
 }
 

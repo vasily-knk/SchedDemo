@@ -44,7 +44,6 @@ SchedDemo::~SchedDemo()
 void SchedDemo::updateCost()
 {
 	perm2sched(task_, perm_, sched_);
-	scene_->updateItems();
 	const cost_t cost = get_cost(task_, sched_);
 	const QString text = QString("Cost: %1").arg(cost);
 	setWindowTitle(text);

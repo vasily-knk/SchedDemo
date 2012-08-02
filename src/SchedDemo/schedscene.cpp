@@ -59,7 +59,6 @@ SchedScene::SchedScene(task_t *task, perm_t *perm, sched_t *sched, QObject *pare
 	for (size_t i = 0; i < task->size(); ++i)
 	{
 		jobs_[i] = new SchedItem(this, i);
-		jobs_[i]->updateData(getItemWidth(i));
 		addItem(jobs_[i]);
 
 		lbLines_ [i] = addLine(QLineF(), normalLine);
@@ -74,7 +73,7 @@ SchedScene::SchedScene(task_t *task, perm_t *perm, sched_t *sched, QObject *pare
 	datesTimeline_ = addLine(QLineF());
 	jobsTimeline_ = addLine(QLineF());
 
-	updateItems();
+	invalidateItems();
 }
 
 void SchedScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -100,11 +99,8 @@ void SchedScene::keyPressEvent(QKeyEvent *keyEvent)
     if (keyEvent->key() == Qt::Key_Space)
     {
         *perm_ = random_solver(*task_, *perm_, 10000);
-        for (size_t i = 0; i < jobs_.size(); ++i)
-        {
-            jobs_[i]->updateData(getItemWidth(i));
-        }
-        //updateItems();
+
+        invalidateItems();
         updateCost();
     }
 }
@@ -131,14 +127,16 @@ void SchedScene::swapItems(size_t i, size_t j)
     std::swap((*perm_)[i], (*perm_)[j]);
 
 
+/*
     jobs_[i]->updateData(getItemWidth(i));
     if (i > 0)
         jobs_[i-1]->updateData(getItemWidth(i-1));
     jobs_[j]->updateData(getItemWidth(j));
     if (j > 0)
         jobs_[j-1]->updateData(getItemWidth(j-1));
+*/
 
-    updateItems();
+    invalidateItems();
     updateCost();
 }
 
@@ -208,7 +206,7 @@ qreal SchedScene::getItemWidth(size_t i) const
     {
         const size_t job_i = (*perm_)[i];
         const size_t next_job = (*perm_)[i + 1];
-        return (*task_)[job_i].spans[next_job];
+        return time2coord((*task_)[job_i].spans[next_job]);
     }
     return 20; // FIXME!
 }
@@ -236,5 +234,25 @@ void SchedScene::updateCost()
 {
 	if (cost_clb_ != NULL)
 		cost_clb_();
+}
+
+void SchedScene::invalidateItems()
+{
+    for (size_t i = 0; i < jobs_.size(); ++i)
+    {
+        const size_t job_i = (*perm_)[i];
+        
+        qreal width = 5;
+
+        if (i < jobs_.size() - 1)
+        {
+            const size_t next_job = (*perm_)[i + 1];
+            width = time2coord((*task_)[job_i].spans[next_job]);
+        }
+        
+        jobs_[i]->updateData(width, weight2coord((*task_)[job_i].tweight));
+    }
+
+    updateItems();
 }
 
