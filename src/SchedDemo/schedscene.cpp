@@ -3,7 +3,6 @@
 #include "schedscene.h"
 #include "scheditem.h"
 
-perm_t random_solver(const task_t &t, const perm_t &src, size_t n_iters);
 
 
 struct Marker : QGraphicsItem
@@ -99,9 +98,6 @@ void SchedScene::keyPressEvent(QKeyEvent *keyEvent)
 {
     if (keyEvent->key() == Qt::Key_Space)
     {
-        *perm_ = random_solver(*task_, *perm_, 10000);
-
-        updateCost();
         invalidateItems();
     }
 }
@@ -167,7 +163,7 @@ void SchedScene::showTRect(size_t item)
 
     if (tardiness > 0)
     {
-        tRect_->setRect(time2coord((*task_)[job].due), JOBS_HEIGHT, time2coord(tardiness), /*JOBS_HEIGHT + */(*task_)[job].tweight);
+        tRect_->setRect(time2coord((*task_)[job].due), JOBS_HEIGHT, time2coord(tardiness), /*JOBS_HEIGHT + */weight2coord((*task_)[job].tweight));
         tRect_->setVisible(true);
     }
     else
@@ -198,6 +194,7 @@ size_t SchedScene::job2item(size_t job) const
     return (std::find(perm_->begin(), perm_->end(), job) - perm_->begin());
 }
 
+/*
 qreal SchedScene::getItemWidth(size_t i) const
 {
     if (i < task_->size() - 1)
@@ -207,7 +204,7 @@ qreal SchedScene::getItemWidth(size_t i) const
         return time2coord((*task_)[job_i].spans[next_job]);
     }
     return 20; // FIXME!
-}
+}*/
 
 void SchedScene::updateItems()
 {

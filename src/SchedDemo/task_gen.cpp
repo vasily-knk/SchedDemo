@@ -59,7 +59,7 @@ void planes_task(float timespan, task_t &t)
         t[i].spans.resize(t.size());
         for (size_t j = 0; j < t.size(); ++j)
         {
-            t[i].spans[j] = get_class_wait(classes[i], classes[j]) * 20;
+            t[i].spans[j] = get_class_wait(classes[i], classes[j]);
         }
     }
 
@@ -68,7 +68,7 @@ void planes_task(float timespan, task_t &t)
     {
         t[i].due = dates_distr(randgen);
         t[i].min_bound = t[i].due;
-        t[i].tweight = 20.0 + classes_distr(randgen) * 80;
+        t[i].tweight = .2 + classes_distr(randgen) * .8;
     }
 
 

@@ -15,18 +15,20 @@ public:
 
 protected slots:
     void runSolver(int i);
-    void runSolver1();
 private:
     struct solver_slot_t
     {
-        solver_slot_t(const char* name)
+        solver_slot_t(const char* name, const solver_t &solver)
             : name(name)
+            , solver(solver)
             , btn(NULL)
             , lbl(NULL)
         {
 
         }
         QString name;
+
+        solver_t solver;
         QPushButton *btn;
         QLabel *lbl;
     };
@@ -40,6 +42,7 @@ private:
 
 	SchedScene *scene_;
     vector<solver_slot_t> solver_slots_;
+    QLabel *cost_display_;
 };
 
 #endif // SCHEDDEMO_H

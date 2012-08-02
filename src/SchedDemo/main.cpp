@@ -12,6 +12,16 @@ cost_t calculate_cost(const task_t &task, const perm_t &perm)
     return get_cost(task, sched);
 }
 
+perm_t due_dates_solver(const task_t &t, const perm_t &src)
+{
+    perm_t dst(src);
+    std::sort(dst.begin(), dst.end(), [&](size_t i, size_t j) -> bool
+    {
+        return (t[i].due < t[j].due);
+    });
+    return dst;
+}
+
 perm_t random_solver(const task_t &t, const perm_t &src, size_t n_iters)
 {
     perm_t dst (src);

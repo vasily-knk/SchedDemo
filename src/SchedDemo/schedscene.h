@@ -38,7 +38,7 @@ public:
 
     size_t item2job(size_t item) const;
     size_t job2item(size_t job) const;
-    qreal getItemWidth(size_t item) const;
+//     qreal getItemWidth(size_t item) const;
 
 	
 	typedef boost::function<void()> cost_clb_t;
