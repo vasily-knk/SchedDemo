@@ -67,8 +67,8 @@ void planes_task(float timespan, task_t &t)
     for (size_t i = 0; i < n; ++i)
     {
         t[i].due = dates_distr(randgen);
-        t[i].min_bound = t[i].due;
-        t[i].tweight = .2 + classes_distr(randgen) * 1.8;
+        t[i].min_bound = 0;//t[i].due;
+        t[i].eweight = t[i].tweight = .2 + classes_distr(randgen) * 1.8;
     }
 
 

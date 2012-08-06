@@ -12,6 +12,7 @@ public:
 	~SchedDemo();
 
 	void updateCost();
+    void updateOffset(size_t offset);
 
 protected slots:
     void runSolver(int i);

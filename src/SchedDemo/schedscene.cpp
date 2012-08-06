@@ -115,7 +115,7 @@ void SchedScene::clickItem(size_t id)
     else
     {
         swapItems(*selected_, id);
-        deselectItem();
+        //deselectItem();
     }
 }
 

@@ -5,13 +5,6 @@
 
 
 
-cost_t calculate_cost(const task_t &task, const perm_t &perm)
-{
-    sched_t sched(task.size());
-    perm2sched (task, perm, sched);
-    return get_cost(task, sched);
-}
-
 perm_t due_dates_solver(const task_t &t, const perm_t &src)
 {
     perm_t dst(src);
@@ -51,7 +44,7 @@ perm_t all_pairs_solver(const task_t &t, const perm_t &src)
 
 
     size_t best_i = 0, best_j = 0;
-    cost_t best_cost = orig_cost + 1;
+    cost_t best_cost = orig_cost;
 
     bool success = true;
     int iter;
@@ -88,6 +81,7 @@ perm_t all_pairs_solver(const task_t &t, const perm_t &src)
 
         //cout << " iter " << iter << ", cost " << best_cost << endl;
     } 
+    qDebug() << iter << " iterations";
 
     return dst;        
 }
@@ -134,6 +128,56 @@ perm_t annealing_solver(const task_t &t, const perm_t &src)
     return dst;
 }
 
+perm_t all_triples_solver(const task_t &t, const perm_t &src, size_t n_iters)
+{
+    perm_t dst (src);
+
+
+    for (size_t iter = 0; iter < n_iters; ++iter)
+    {
+        int counter = 0;
+        for (size_t i = 0; i < t.size() - 2; ++i)
+        {
+            for (size_t j = i + 1; j < t.size() - 1; ++j)
+            {
+                for (size_t k = j + 1; k < t.size(); ++k)
+                {
+                    size_t triple[] = {i, j, k};
+                    perm_t best(dst);
+                    cost_t best_cost = calculate_cost(t, best);
+
+                    perm_t orig(dst);
+                    bool flag = false;
+                    do 
+                    {
+                        dst[i] = orig[triple[0]];
+                        dst[j] = orig[triple[1]];
+                        dst[k] = orig[triple[2]];
+
+                        cost_t curr_cost = calculate_cost(t, dst);
+                        if (curr_cost < best_cost)
+                        {
+                            best = dst;
+                            best_cost = curr_cost;
+                            flag = true;
+                        }
+                    } while (std::next_permutation(triple, triple + 3));
+
+                    if (flag)
+                    {
+                        dst = best;
+                        ++counter;
+                    }
+                    else
+                        dst = orig;
+
+                }
+            }
+        }
+        //cout << " iter " << iter << ": " << counter << " swaps" << endl;
+    }
+    return dst;        
+}
 
 int main(int argc, char *argv[])
 {

@@ -2,6 +2,8 @@
 #include "scheddemo.h"
 #include "schedscene.h"
 
+#include "sliding_window.h"
+
 namespace 
 {
 	const size_t DEFAULT_N = 50;
@@ -13,6 +15,7 @@ perm_t due_dates_solver(const task_t &t, const perm_t &src);
 perm_t random_solver(const task_t &t, const perm_t &src, size_t n_iters);
 perm_t all_pairs_solver(const task_t &t, const perm_t &src);
 perm_t annealing_solver(const task_t &t, const perm_t &src);
+perm_t all_triples_solver(const task_t &t, const perm_t &src, size_t n_iters);
 
 SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
 	: QWidget(parent, flags)
@@ -44,7 +47,11 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
     solver_slots_.push_back(solver_slot_t("Due dates", due_dates_solver));
     solver_slots_.push_back(solver_slot_t("Random pair", boost::bind(random_solver, _1, _2, 10000)));
     solver_slots_.push_back(solver_slot_t("Best pair", all_pairs_solver));
+    solver_slots_.push_back(solver_slot_t("Best triple", boost::bind(all_triples_solver, _1, _2, 7)));
     solver_slots_.push_back(solver_slot_t("Annealing", annealing_solver));
+
+    sliding_window_solver sws(5, boost::bind(&SchedDemo::updateOffset, this, _1));
+    solver_slots_.push_back(solver_slot_t("Window", sws));
 
     QGridLayout *layout = new QGridLayout;
 
@@ -107,5 +114,11 @@ void SchedDemo::runSolver(int i)
     const cost_t cost = get_cost(task_, sched_);
     solver_slots_[i].lbl->setText(QString::number(cost));
     scene_->invalidateItems();
+}
+
+void SchedDemo::updateOffset(size_t offset)
+{
+    const QString str = QString("Offset: ") + QString::number(offset);
+    setWindowTitle(str);
 }
 

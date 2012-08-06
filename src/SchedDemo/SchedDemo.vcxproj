@@ -131,6 +131,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scheditem.h" />
+    <ClInclude Include="sliding_window.h" />
     <ClInclude Include="task.h" />
     <CustomBuild Include="schedscene.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

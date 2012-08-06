@@ -8,7 +8,7 @@ struct job_t
 {
     moment_t due;
     vector<moment_t> spans;
-    cost_t tweight;
+    cost_t eweight, tweight;
     moment_t min_bound;
 };
 
@@ -51,6 +51,7 @@ typedef vector<moment_t> sched_t;
 
 void perm2sched(const task_t &task, const perm_t &perm, sched_t &out);
 cost_t get_cost(const task_t &task, const sched_t &sched);
+cost_t calculate_cost(const task_t &task, const perm_t &perm);
 
 typedef boost::function<perm_t(const task_t &, const perm_t &)> solver_t;
 
