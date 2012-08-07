@@ -49,7 +49,7 @@ typedef vector<moment_t> sched_t;
 */
 
 
-void perm2sched(const task_t &task, const perm_t &perm, sched_t &out);
+void perm2sched(const task_t &task, const perm_t &perm, sched_t &out_sched);
 cost_t get_cost(const task_t &task, const sched_t &sched);
 cost_t calculate_cost(const task_t &task, const perm_t &perm);
 

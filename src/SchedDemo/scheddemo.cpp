@@ -6,7 +6,7 @@
 
 namespace 
 {
-	const size_t DEFAULT_N = 50;
+	const size_t DEFAULT_N = 20;
 
 }
 void planes_task(float timespan, task_t &t);
@@ -23,6 +23,7 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
 	, perm_ (DEFAULT_N)
 	, sched_(DEFAULT_N)
     , cost_(0)
+    , reschedule_index_(DEFAULT_N - 1)
 {
 	const moment_t timespan = 60;
 
@@ -78,10 +79,17 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
 
     
     sideLayout->addWidget(new QLabel("Cost:"), solver_slots_.size(), 0);
+
+    QPushButton *rescheduleBtn = new QPushButton("Reschedule");
+    sideLayout->addWidget(rescheduleBtn, solver_slots_.size() + 1, 0);
+    connect(rescheduleBtn, SIGNAL(clicked()), this, SLOT(reschedule()));
+
     
     cost_display_ = new QLabel("AAA");
     sideLayout->addWidget(cost_display_, solver_slots_.size(), 1);
     sidePanel->setLayout(sideLayout);
+
+
 
     layout->addWidget(view, 0, 0);
     layout->addWidget(sidePanel, 0, 1);
@@ -99,6 +107,10 @@ SchedDemo::~SchedDemo()
 void SchedDemo::updateCost()
 {
 	perm2sched(task_, perm_, sched_);
+
+    reschedule_index_ = task_.size() - 1;
+    scene_->current.reset();
+
 	const cost_t cost = get_cost(task_, sched_);
     cost_display_->setText(QString::number(cost));
 }
@@ -120,5 +132,28 @@ void SchedDemo::updateOffset(size_t offset)
 {
     const QString str = QString("Offset: ") + QString::number(offset);
     setWindowTitle(str);
+}
+
+
+inline time_t get_processing_time(const task_t &task, const perm_t &perm, const size_t pos);
+void add_job(const task_t &task, const perm_t &perm, const size_t pos, sched_t &out_sched);
+
+void SchedDemo::reschedule()
+{
+
+    add_job(task_, perm_, reschedule_index_, sched_);
+    for (int pos = reschedule_index_ - 1; pos >= 0; --pos)
+        sched_[perm_[pos]] = sched_[perm_[pos + 1]] - get_processing_time(task_, perm_, pos) - 1.0;
+
+    
+    scene_->current.reset(reschedule_index_);
+
+    if (reschedule_index_ == 0)
+        reschedule_index_ = task_.size() - 1;
+    else
+        --reschedule_index_;
+
+    scene_->invalidateItems();
+    
 }
 

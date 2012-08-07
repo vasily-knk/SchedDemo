@@ -16,6 +16,7 @@ public:
 
 protected slots:
     void runSolver(int i);
+    void reschedule();
 private:
     struct solver_slot_t
     {
@@ -44,6 +45,9 @@ private:
 	SchedScene *scene_;
     vector<solver_slot_t> solver_slots_;
     QLabel *cost_display_;
+
+    size_t reschedule_index_;
+
 };
 
 #endif // SCHEDDEMO_H

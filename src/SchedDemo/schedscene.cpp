@@ -61,8 +61,8 @@ SchedScene::SchedScene(task_t *task, perm_t *perm, sched_t *sched, QObject *pare
 		jobs_[i] = new SchedItem(this, i);
 		addItem(jobs_[i]);
 
-		lbLines_ [i] = addLine(QLineF(), normalLine);
-		ubLines_ [i] = NULL;
+		//lbLines_ [i] = addLine(QLineF(), normalLine);
+		lbLines_ [i] = ubLines_ [i] = NULL;
 		dueLines_[i] = addLine(QLineF(), normalLine);
 	}
 
@@ -169,7 +169,7 @@ void SchedScene::showTRect(size_t item)
     else
         tRect_->setVisible(false);
 
-	lbLines_[item]->setPen(thickLine);
+	//lbLines_[item]->setPen(thickLine);
 	dueLines_[item]->setPen(thickLine);
 
     //tRect_->update();
@@ -179,7 +179,7 @@ void SchedScene::hideTRect(size_t item)
 {
     tRect_->setVisible(false);
 
-	lbLines_[item]->setPen(normalLine);
+	//lbLines_[item]->setPen(normalLine);
 	dueLines_[item]->setPen(normalLine);
 }
 
@@ -213,7 +213,7 @@ void SchedScene::updateItems()
 		const size_t index = (*perm_)[i];
         jobs_[i]->setPos(time2coord((*sched_)[index]), JOBS_HEIGHT);
 
-		lbLines_ [i]->setLine(time2coord((*sched_)[index]), JOBS_HEIGHT, time2coord((*task_)[index].min_bound), DATES_HEIGHT);
+		//lbLines_ [i]->setLine(time2coord((*sched_)[index]), JOBS_HEIGHT, time2coord((*task_)[index].min_bound), DATES_HEIGHT);
 		dueLines_[i]->setLine(time2coord((*sched_)[index]), JOBS_HEIGHT, time2coord((*task_)[index].due),       DATES_HEIGHT);
 	}
 
@@ -256,12 +256,20 @@ void SchedScene::invalidateItems()
 
     for (size_t i = 0; i < tards.size(); ++i)
     {
-        float ratio = tards[i] / max_tard;
-        int green = std::min(static_cast<int>(255.0 * 2.0 * (1.0 - ratio)), 255);
-        int red = std::min(static_cast<int>(255.0 * 2.0 * ratio), 255);
-
-        jobs_[i]->setColor(QColor(red, green, 0));
+        if (true || tards[i] < 0 || std::fabs(max_tard) < 0.00001)
+            jobs_[i]->setColor(QColor(0, 255, 255));
+        else
+        {
+            float ratio = tards[i] / max_tard;
+            int green = std::min(static_cast<int>(255.0 * 2.0 * (1.0 - ratio)), 255);
+            int red = std::min(static_cast<int>(255.0 * 2.0 * ratio), 255);
+            jobs_[i]->setColor(QColor(red, green, 0));
+        }
     }
+
+    if (current.is_initialized())
+        jobs_[*current]->setColor(QColor(255, 0, 0));
+
 
 
     updateItems();

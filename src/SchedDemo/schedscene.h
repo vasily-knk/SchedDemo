@@ -102,6 +102,9 @@ private:
     const qreal DATES_HEIGHT, JOBS_HEIGHT;
 
 	cost_clb_t cost_clb_;
+
+public:
+    boost::optional<size_t> current;
 };
 
 #endif // SCHEDSCENE_H
