@@ -61,8 +61,8 @@ SchedScene::SchedScene(task_t *task, perm_t *perm, sched_t *sched, QObject *pare
 		jobs_[i] = new SchedItem(this, i);
 		addItem(jobs_[i]);
 
-		//lbLines_ [i] = addLine(QLineF(), normalLine);
-		lbLines_ [i] = ubLines_ [i] = NULL;
+		lbLines_ [i] = addLine(QLineF(), normalLine);
+		ubLines_ [i] = NULL;
 		dueLines_[i] = addLine(QLineF(), normalLine);
 	}
 

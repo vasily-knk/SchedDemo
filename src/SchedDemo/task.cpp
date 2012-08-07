@@ -22,14 +22,14 @@ inline time_t get_processing_time(const task_t &task, const perm_t &perm, const 
 
 void add_job(const task_t &task, const perm_t &perm, const size_t pos, sched_t &out_sched)
 {
+    const size_t n = task.size();
     const size_t job = perm[pos];
-    if (pos == task.size() - 1)
+    if (pos == n - 1)
     {
         out_sched[job] = task[job].due;
         return;
     }
     
-    const size_t n = task.size();
     sections_array_t sections;
 
     moment_t offset = get_processing_time(task, perm, pos);

@@ -6,7 +6,7 @@
 
 namespace 
 {
-	const size_t DEFAULT_N = 20;
+	const size_t DEFAULT_N = 30;
 
 }
 void planes_task(float timespan, task_t &t);
