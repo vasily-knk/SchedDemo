@@ -1,24 +1,13 @@
 #include "stdafx.h"
-#include "task.h"
 
 namespace
 {
-
     typedef multimap<moment_t, cost_t> sections_array_t;
     typedef sections_array_t::value_type section_t;
 
 }
 
 
-
-
-inline time_t get_processing_time(const task_t &task, const perm_t &perm, const size_t pos)
-{
-    if (pos == task.size() - 1)
-        return 0;
-
-    return task[perm[pos]].spans[perm[pos + 1]];
-}
 
 void add_job(const task_t &task, const perm_t &perm, const size_t pos, sched_t &out_sched)
 {
@@ -69,7 +58,6 @@ void add_job(const task_t &task, const perm_t &perm, const size_t pos, sched_t &
     out_sched[job] = std::min(loc->first, task[job].due);
     out_sched[job] = std::max(out_sched[job], task[job].min_bound);
 
-
     for (size_t pos1 = pos + 1; pos1 < n; ++pos1)
     {
         const size_t job1 = perm[pos1];
@@ -79,7 +67,7 @@ void add_job(const task_t &task, const perm_t &perm, const size_t pos, sched_t &
     }
 }
 
-void perm2sched(const task_t &task, const perm_t &perm, sched_t &out_sched)
+void slow_perm2sched(const task_t &task, const perm_t &perm, sched_t &out_sched)
 {
     assert (task.size() == perm.size());
     assert (task.size() == out_sched.size());
@@ -115,7 +103,7 @@ cost_t get_cost(const task_t &task, const sched_t &sched)
 cost_t calculate_cost(const task_t &task, const perm_t &perm)
 {
     sched_t sched(task.size());
-    perm2sched (task, perm, sched);
+    slow_perm2sched (task, perm, sched);
     return get_cost(task, sched);
 }
 

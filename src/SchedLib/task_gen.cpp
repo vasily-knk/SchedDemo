@@ -1,22 +1,27 @@
 #include "stdafx.h"
 
-enum plane_class
+namespace
 {
-    LIGHT = 0, MEDIUM = 1, HEAVY = 2
-};
 
-float get_class_wait(plane_class i, plane_class j)
-{
-    if (i == LIGHT)
-        return 1;
-    else if (i == HEAVY)
-        return 4;
-    else
+    enum plane_class
     {
-        if (j == HEAVY)
-            return 2;
+        LIGHT = 0, MEDIUM = 1, HEAVY = 2
+    };
+
+    float get_class_wait(plane_class i, plane_class j)
+    {
+        if (i == LIGHT)
+            return 1;
+        else if (i == HEAVY)
+            return 4;
         else
-            return 3;
+        {
+            if (j == HEAVY)
+                return 2;
+            else
+                return 3;
+        }
+
     }
 
 }
@@ -25,7 +30,6 @@ inline bool job_cmp(const job_t &job1, const job_t &job2)
 {
     return (job1.due < job2.due);
 }
-
 
 void planes_task_test(float timespan, task_t &out_task)
 {
@@ -41,10 +45,11 @@ void planes_task_test(float timespan, task_t &out_task)
     out_task[1].min_bound = -100;
     out_task[2].min_bound = -100;
 
-    std::fill(out_task[0].spans.begin(), out_task[0].spans.end(), 4);
-    std::fill(out_task[1].spans.begin(), out_task[1].spans.end(), 4);
-    std::fill(out_task[2].spans.begin(), out_task[2].spans.end(), 4);
+    std::fill(out_task[0].spans.begin(), out_task[0].spans.end(), 4.0f);
+    std::fill(out_task[1].spans.begin(), out_task[1].spans.end(), 4.0f);
+    std::fill(out_task[2].spans.begin(), out_task[2].spans.end(), 4.0f);
 }
+
 void planes_task(float timespan, task_t &out_task)
 {
     typedef mt19937 gen;
@@ -86,8 +91,8 @@ void planes_task(float timespan, task_t &out_task)
     for (size_t i = 0; i < n; ++i)
     {
         out_task[i].due = dates_distr(randgen);
-        out_task[i].min_bound = -100;//t[i].due;
-        out_task[i].eweight = out_task[i].tweight = .2 + classes_distr(randgen) * 1.8;
+        out_task[i].min_bound = -100.0f;//t[i].due;
+        out_task[i].eweight = out_task[i].tweight = .2f + classes_distr(randgen) * 1.8f;
     }
 
     out_task[3].eweight = out_task[3].tweight = 5;
@@ -108,7 +113,6 @@ void planes_task(float timespan, task_t &out_task)
     //return t;
 }
 
-
 void planes_task1(const float timespan, task_t &out_task)
 {
     const moment_t span = timespan / out_task.size();
@@ -116,8 +120,8 @@ void planes_task1(const float timespan, task_t &out_task)
     {
         out_task[i].due = i * span;
         out_task[i].min_bound = 0;
-        out_task[i].eweight = out_task[i].tweight = i * 10 + 1;
+        out_task[i].eweight = out_task[i].tweight = i * 10.0f + 1.0f;
         
-        std::fill(out_task[i].spans.begin(), out_task[i].spans.end(), span * 0.5);
+        std::fill(out_task[i].spans.begin(), out_task[i].spans.end(), span * 0.5f);
     }
 }

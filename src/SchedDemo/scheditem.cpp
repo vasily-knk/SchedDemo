@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "task.h"
 #include "scheditem.h"
 #include "schedscene.h"
 

@@ -48,8 +48,16 @@ typedef vector<moment_t> sched_t;
 
 */
 
+inline moment_t get_processing_time(const task_t &task, const perm_t &perm, const size_t pos)
+{
+    if (pos == task.size() - 1)
+        return 0;
 
-void perm2sched(const task_t &task, const perm_t &perm, sched_t &out_sched);
+    return task[perm[pos]].spans[perm[pos + 1]];
+}
+
+
+void slow_perm2sched(const task_t &task, const perm_t &perm, sched_t &out_sched);
 cost_t get_cost(const task_t &task, const sched_t &sched);
 cost_t calculate_cost(const task_t &task, const perm_t &perm);
 

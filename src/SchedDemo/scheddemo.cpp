@@ -28,7 +28,7 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
 	const moment_t timespan = 60;
 
 	planes_task(timespan, task_);
-	perm2sched(task_, perm_, sched_);
+	slow_perm2sched(task_, perm_, sched_);
 
 	scene_ = new SchedScene(&task_, &perm_, &sched_);
 	
@@ -106,7 +106,7 @@ SchedDemo::~SchedDemo()
 
 void SchedDemo::updateCost()
 {
-	perm2sched(task_, perm_, sched_);
+	slow_perm2sched(task_, perm_, sched_);
 
     reschedule_index_ = task_.size() - 1;
     scene_->current.reset();
@@ -135,7 +135,7 @@ void SchedDemo::updateOffset(size_t offset)
 }
 
 
-inline time_t get_processing_time(const task_t &task, const perm_t &perm, const size_t pos);
+inline moment_t get_processing_time(const task_t &task, const perm_t &perm, const size_t pos);
 void add_job(const task_t &task, const perm_t &perm, const size_t pos, sched_t &out_sched);
 
 void SchedDemo::reschedule()
