@@ -2,21 +2,7 @@
 
 namespace
 {
-    typedef multimap<moment_t, size_t> jobs_list_t;
-    
-    void add_job(const task_t &task, const perm_t &perm, 
-                 jobs_list_t &jobs_list, const size_t pos, 
-                 sched_t *out_sched, moment_t *out_offset)
-    {
-        const size_t n = task.size();
-        
-        if (pos == n - 1)
-        {
-            
-            return;
-        }
-
-    }
+    typedef multimap<moment_t, cost_t> jobs_list_t;
 }
 
 sched_t perm2sched(const task_t &task, const perm_t &perm)
@@ -30,11 +16,13 @@ sched_t perm2sched(const task_t &task, const perm_t &perm)
     jobs_list_t jobs_list;
     moment_t offset = 0;
     cost_t penalty_offset = 0;
-    sched_t sched;
+    sched_t sched(n);
 
     // Hanging last job
-    jobs_list.insert(jobs_list_t::value_type(0, n - 1));
-    sched[perm.back()] = task[perm.back()].due;
+    const size_t last_job = perm.back();
+    jobs_list.insert(jobs_list_t::value_type(0.0f, task[last_job].tweight));
+    sched[last_job] = task[last_job].due;
+
 
     for (int pos = n - 2; pos >= 0; --pos)
     {
@@ -44,7 +32,6 @@ sched_t perm2sched(const task_t &task, const perm_t &perm)
         const moment_t original_time = sched[next_job] - get_processing_time(task, perm, pos);
         //const moment_t earliness = std::max<moment_t>(original_time - task[job].due, 0);
         moment_t final_time;
-        moment_t earliness;
         cost_t weight;
         
         if (original_time >= task[job].due)
@@ -83,9 +70,20 @@ sched_t perm2sched(const task_t &task, const perm_t &perm)
             weight = task[job].eweight + task[job].tweight;
         }
 
-        offset += task[job].due - original_time;
+        offset += final_time - original_time;
         
         const moment_t freedom = offset + task[job].due - final_time;
         jobs_list.insert(jobs_list_t::value_type(freedom, weight));
+
+        sched[job] = final_time;
     }
+
+    for (size_t pos = 1; pos < n; ++pos)
+    {
+        const size_t job = perm[pos];
+        const size_t prev_job = perm[pos - 1];
+        sched[job] = std::max<moment_t>(sched[prev_job] + get_processing_time(task, perm, pos - 1), sched[job]);
+    }
+    
+    return sched;
 }

@@ -31,7 +31,7 @@ inline bool job_cmp(const job_t &job1, const job_t &job2)
     return (job1.due < job2.due);
 }
 
-void planes_task_test(float timespan, task_t &out_task)
+void planes_task_test(float, task_t &out_task)
 {
     out_task[0].due = 2;
     out_task[1].due = 0;

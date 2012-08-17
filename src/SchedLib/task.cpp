@@ -38,7 +38,7 @@ void add_job(const task_t &task, const perm_t &perm, const size_t pos, sched_t &
         offset += get_processing_time(task, perm, pos1);
     }
 
-    sections.insert(section_t(task[job].min_bound, 0));
+    sections.insert(section_t(task[job].min_bound, 0.0f));
     sections.insert(section_t(task[job].due, task[job].eweight + task[job].tweight));
 
     cost_t total_gain = 0;

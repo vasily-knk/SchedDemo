@@ -30,4 +30,6 @@ using boost::random::uniform_int_distribution;
 
 #include <limits>
 
-
+#include <iostream>
+using std::cout;
+using std::endl;

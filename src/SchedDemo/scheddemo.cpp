@@ -17,6 +17,8 @@ perm_t all_pairs_solver(const task_t &t, const perm_t &src);
 perm_t annealing_solver(const task_t &t, const perm_t &src);
 perm_t all_triples_solver(const task_t &t, const perm_t &src, size_t n_iters);
 
+sched_t perm2sched(const task_t &task, const perm_t &perm);
+
 SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
 	: QWidget(parent, flags)
 	, task_ (DEFAULT_N)
@@ -29,6 +31,7 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
 
 	planes_task(timespan, task_);
 	slow_perm2sched(task_, perm_, sched_);
+    perm2sched(task_, perm_);
 
 	scene_ = new SchedScene(&task_, &perm_, &sched_);
 	

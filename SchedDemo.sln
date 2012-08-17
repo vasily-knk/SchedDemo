@@ -8,6 +8,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SchedDemo", "src\SchedDemo\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SchedLib", "src\SchedLib\SchedLib.vcxproj", "{958D8CFD-0C30-42EF-A03F-A4304E52E8BE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SchedTest", "src\SchedTest\SchedTest.vcxproj", "{FC436242-147E-44B7-9BDB-108211BE42E9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{958D8CFD-0C30-42EF-A03F-A4304E52E8BE} = {958D8CFD-0C30-42EF-A03F-A4304E52E8BE}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -27,6 +32,12 @@ Global
 		{958D8CFD-0C30-42EF-A03F-A4304E52E8BE}.Profiling|Win32.Build.0 = Release|Win32
 		{958D8CFD-0C30-42EF-A03F-A4304E52E8BE}.Release|Win32.ActiveCfg = Release|Win32
 		{958D8CFD-0C30-42EF-A03F-A4304E52E8BE}.Release|Win32.Build.0 = Release|Win32
+		{FC436242-147E-44B7-9BDB-108211BE42E9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FC436242-147E-44B7-9BDB-108211BE42E9}.Debug|Win32.Build.0 = Debug|Win32
+		{FC436242-147E-44B7-9BDB-108211BE42E9}.Profiling|Win32.ActiveCfg = Release|Win32
+		{FC436242-147E-44B7-9BDB-108211BE42E9}.Profiling|Win32.Build.0 = Release|Win32
+		{FC436242-147E-44B7-9BDB-108211BE42E9}.Release|Win32.ActiveCfg = Release|Win32
+		{FC436242-147E-44B7-9BDB-108211BE42E9}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
