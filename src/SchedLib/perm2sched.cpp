@@ -9,28 +9,34 @@ sched_t perm2sched(const task_t &task, const perm_t &perm)
 {
     assert (!task.empty());
     assert (task.size() == perm.size());
-    assert (task.size() == out_sched.size());
 
     const size_t n = task.size();
 
     jobs_list_t jobs_list;
     moment_t offset = 0;
-    cost_t penalty_offset = 0;
+
     sched_t sched(n);
 
     // Hanging last job
     const size_t last_job = perm.back();
-    jobs_list.insert(jobs_list_t::value_type(0.0f, task[last_job].tweight));
+    const moment_t m = 0;
+
+    auto v = std::make_pair(m, task[last_job].tweight);
+                                      
+    jobs_list.insert(v);
     sched[last_job] = task[last_job].due;
+
+    vector<std::pair<moment_t, cost_t> > to_add;
 
 
     for (int pos = n - 2; pos >= 0; --pos)
     {
+        to_add.clear();
+        
         const size_t job = perm[pos];
         const size_t next_job = perm[pos + 1];
         
         const moment_t original_time = sched[next_job] - get_processing_time(task, perm, pos);
-        //const moment_t earliness = std::max<moment_t>(original_time - task[job].due, 0);
         moment_t final_time;
         cost_t weight;
         
@@ -38,43 +44,62 @@ sched_t perm2sched(const task_t &task, const perm_t &perm)
         {
             // Free-hanging job
             final_time = task[job].due;
-            weight = task[job].tweight;
+            //to_add.push_back(std::make_pair(moment_t(0), task[job].tweight));
         }
         else
         {
+            bool reached_due = true;
+            cost_t gathered_penalty = -task[job].eweight;
+            
             // Early job
             jobs_list_t::iterator it;
+            moment_t last_push = 0;
             for (it = jobs_list.begin(); it != jobs_list.end(); ++it)
             {
                 // Job at its due date, no need to move further
                 if (it->first - offset > task[job].due - original_time)
+                    break;
+                
+                // Enough penalty gathered
+                if (gathered_penalty > 0)
                 {
-                    final_time = task[job].due;
+                    reached_due = false;
+                    final_time = last_push - offset + original_time;
                     break;
                 }
                 
-                // Enough penalty gathered
-                if (penalty_offset + it->second > task[job].eweight)
-                    break;
-                
-                // Both calculating sum of penalties for comparison and updating offset for penalties to be removed
-                penalty_offset += it->second;
+                // Both calculating sum of penalties for comparison 
+                // and updating offset for penalties to be removed
+                gathered_penalty += it->second;
+                last_push = it->first;
             }
-            
-            final_time = (it->first - offset) + original_time;
-
             // Removing penalties for late jobs (added to offset)
             jobs_list.erase(jobs_list.begin(), it);
             
-            penalty_offset -= task[job].eweight;
-            weight = task[job].eweight + task[job].tweight;
+            if (reached_due)
+            {
+                final_time = task[job].due;
+                weight += task[job].tweight;
+                //to_add.push_back(jobs_list_t::value_type(moment_t(0), gathered_penalty));
+            }
+            else
+            {
+                const moment_t moment1 = 0;
+                const moment_t moment2 = task[job].due - final_time;
+                
+                //to_add.push_back(jobs_list_t::value_type(moment1, gathered_penalty));
+                //to_add.push_back(jobs_list_t::value_type(moment2, task[job].eweight + task[job].tweight));
+            }
         }
 
         offset += final_time - original_time;
+        /*for (auto it = to_add.cbegin(); it != to_add.cend(); ++it)
+        {
+            auto val = *it;
+            val.second += offset;
+            jobs_list.insert(val);
+        }*/
         
-        const moment_t freedom = offset + task[job].due - final_time;
-        jobs_list.insert(jobs_list_t::value_type(freedom, weight));
-
         sched[job] = final_time;
     }
 
@@ -82,8 +107,10 @@ sched_t perm2sched(const task_t &task, const perm_t &perm)
     {
         const size_t job = perm[pos];
         const size_t prev_job = perm[pos - 1];
-        sched[job] = std::max<moment_t>(sched[prev_job] + get_processing_time(task, perm, pos - 1), sched[job]);
+        sched[job] = std::max<moment_t>(sched[prev_job] + get_processing_time(task, perm, pos - 1), 
+                                        sched[job]);
     }
     
     return sched;
 }
+

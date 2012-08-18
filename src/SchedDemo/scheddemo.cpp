@@ -6,11 +6,12 @@
 
 namespace 
 {
-	const size_t DEFAULT_N = 30;
+	const size_t DEFAULT_N = 3;
 
 }
 void planes_task(float timespan, task_t &t);
 
+perm_t order_solver(const task_t &t, const perm_t &src);
 perm_t due_dates_solver(const task_t &t, const perm_t &src);
 perm_t random_solver(const task_t &t, const perm_t &src, size_t n_iters);
 perm_t all_pairs_solver(const task_t &t, const perm_t &src);
@@ -18,6 +19,9 @@ perm_t annealing_solver(const task_t &t, const perm_t &src);
 perm_t all_triples_solver(const task_t &t, const perm_t &src, size_t n_iters);
 
 sched_t perm2sched(const task_t &task, const perm_t &perm);
+
+task_t gen_task1();
+task_t gen_task2();
 
 SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
 	: QWidget(parent, flags)
@@ -27,11 +31,14 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
     , cost_(0)
     , reschedule_index_(DEFAULT_N - 1)
 {
-	const moment_t timespan = 60;
+	const moment_t timespan = 40;
 
-	planes_task(timespan, task_);
-	slow_perm2sched(task_, perm_, sched_);
-    perm2sched(task_, perm_);
+    
+    task_ = gen_task2();
+
+    //planes_task(timespan, task_);
+	//slow_perm2sched(task_, perm_, sched_);
+    sched_ = perm2sched(task_, perm_);
 
 	scene_ = new SchedScene(&task_, &perm_, &sched_);
 	
@@ -48,6 +55,7 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
 
 
 
+    solver_slots_.push_back(solver_slot_t("Original", order_solver));
     solver_slots_.push_back(solver_slot_t("Due dates", due_dates_solver));
     solver_slots_.push_back(solver_slot_t("Random pair", boost::bind(random_solver, _1, _2, 10000)));
     solver_slots_.push_back(solver_slot_t("Best pair", all_pairs_solver));
@@ -109,7 +117,8 @@ SchedDemo::~SchedDemo()
 
 void SchedDemo::updateCost()
 {
-	slow_perm2sched(task_, perm_, sched_);
+	//slow_perm2sched(task_, perm_, sched_);
+    sched_ = perm2sched(task_, perm_);
 
     reschedule_index_ = task_.size() - 1;
     scene_->current.reset();

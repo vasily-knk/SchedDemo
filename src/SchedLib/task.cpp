@@ -100,10 +100,11 @@ cost_t get_cost(const task_t &task, const sched_t &sched)
     }
     return cost;
 }
+
 cost_t calculate_cost(const task_t &task, const perm_t &perm)
 {
-    sched_t sched(task.size());
-    slow_perm2sched (task, perm, sched);
+    //sched_t sched(task.size());
+    sched_t sched = perm2sched (task, perm);
     return get_cost(task, sched);
 }
 

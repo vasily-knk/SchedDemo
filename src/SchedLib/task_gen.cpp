@@ -95,7 +95,7 @@ void planes_task(float timespan, task_t &out_task)
         out_task[i].eweight = out_task[i].tweight = .2f + classes_distr(randgen) * 1.8f;
     }
 
-    out_task[3].eweight = out_task[3].tweight = 5;
+    //out_task[3].eweight = out_task[3].tweight = 5;
 
 
 

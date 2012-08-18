@@ -3,6 +3,11 @@
 #include "scheditem.h"
 #include "scheddemo.h"
 
+perm_t order_solver(const task_t &t, const perm_t &/*src*/)
+{
+    perm_t dst(t.size());
+    return dst;
+}
 
 
 perm_t due_dates_solver(const task_t &t, const perm_t &src)
