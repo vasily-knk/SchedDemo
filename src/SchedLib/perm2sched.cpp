@@ -34,18 +34,23 @@ namespace
     {
         const size_t job = perm[pos];
 
-        moment_t final_time = task[job].due;
+        const moment_t original_time = sched[job];
+        moment_t final_time = original_time;
+
+        //moment_t final_time = task[job].due;
 
         bool reached_due = true;
         cost_t gathered_penalty = -task[job].eweight;
 
-        moment_t last_push = 0;
         jobs_list_t::iterator it;
         for (it = jobs_list.begin(); it != jobs_list.end(); ++it)
         {
+            const moment_t push = it->first;
+            
             // Job at its due date, no need to move further
-            if (it->first > task[job].due - sched[job])
+            if (push > task[job].due - original_time)
             {
+                final_time = task[job].due;
                 break;
             }
 
@@ -55,18 +60,28 @@ namespace
             if (gathered_penalty > 0)
             {
                 reached_due = false;
-                final_time = sched[job] + it->first;
+                final_time = sched[job] + push;
                 ++it;
                 break;
             }
         }
+
+        moment_t final_time = original_time + push;
+        
+        if (final_time < task[job].min_bound)
+        {
+            
+            final_time = task[job].min_bound;
+        }
+        
+        sched[job] = final_time;
         
         // Removing penalties for late jobs
         jobs_list.erase(jobs_list.begin(), it);
 
-        move_jobs_list(jobs_list, sched[job] - final_time);
+        move_jobs_list(jobs_list, push);
 
-        if (reached_due)
+        if (false && reached_due)
         {
             jobs_list.insert(jobs_list_t::value_type(moment_t(0), gathered_penalty + task[job].eweight + task[job].tweight));
         }
@@ -79,9 +94,7 @@ namespace
             jobs_list.insert(jobs_list_t::value_type(moment2, task[job].eweight + task[job].tweight));
         }
 
-        sched[job] = final_time;
     }
-    
 
     void add_job(const task_t &task, const perm_t &perm, const size_t pos, sched_t &sched, jobs_list_t &jobs_list)
     {
@@ -95,7 +108,6 @@ namespace
         else
             add_early_job(task, perm, pos, sched, jobs_list);
     }
-    
 }
 
 

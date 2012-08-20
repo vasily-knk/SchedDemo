@@ -37,7 +37,7 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
     
     //task_ = gen_task3();
 
-    /*for (int i = 0; ; ++i)
+    for (int i = 0; ; ++i)
     {
         planes_task(timespan, task_);
 
@@ -47,17 +47,17 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
         const cost_t fast_cost = get_cost(task_, fast_sched);
         const cost_t slow_cost = get_cost(task_, slow_sched);
 
-        if (fast_cost - slow_cost < -0.001)
+        if (fast_cost - slow_cost > 0.001)
         {
             sched_ = fast_sched;
             break;
         }
         
-        if (i == 10000)
+        if (i == 1000000)
             exit(1);
-    }*/
-    planes_task(timespan, task_);
-    sched_ = perm2sched(task_, perm_);
+    }
+    //planes_task(timespan, task_);
+    //sched_ = perm2sched(task_, perm_);
 
 	scene_ = new SchedScene(&task_, &perm_, &sched_);
 	
