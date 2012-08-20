@@ -6,7 +6,7 @@
 
 namespace 
 {
-	const size_t DEFAULT_N = 3;
+	const size_t DEFAULT_N = 10;
 
 }
 void planes_task(float timespan, task_t &t);
@@ -22,6 +22,7 @@ sched_t perm2sched(const task_t &task, const perm_t &perm);
 
 task_t gen_task1();
 task_t gen_task2();
+task_t gen_task3();
 
 SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
 	: QWidget(parent, flags)
@@ -31,13 +32,31 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
     , cost_(0)
     , reschedule_index_(DEFAULT_N - 1)
 {
-	const moment_t timespan = 40;
+	const moment_t timespan = 30;
 
     
-    task_ = gen_task2();
+    //task_ = gen_task3();
 
-    //planes_task(timespan, task_);
-	//slow_perm2sched(task_, perm_, sched_);
+    /*for (int i = 0; ; ++i)
+    {
+        planes_task(timespan, task_);
+
+        const sched_t fast_sched = perm2sched(task_, perm_);
+        const sched_t slow_sched = slow_perm2sched(task_, perm_);
+
+        const cost_t fast_cost = get_cost(task_, fast_sched);
+        const cost_t slow_cost = get_cost(task_, slow_sched);
+
+        if (fast_cost - slow_cost < -0.001)
+        {
+            sched_ = fast_sched;
+            break;
+        }
+        
+        if (i == 10000)
+            exit(1);
+    }*/
+    planes_task(timespan, task_);
     sched_ = perm2sched(task_, perm_);
 
 	scene_ = new SchedScene(&task_, &perm_, &sched_);

@@ -42,3 +42,17 @@ task_t gen_task2()
     
     return task;
 }
+
+task_t gen_task3()
+{
+    const size_t n = 4;
+
+    task_t task;
+
+    task.push_back(fast_job(6, 0.5, 1.0, n));
+    task.push_back(fast_job(7.5, 1.0, 2.0, n));
+    task.push_back(fast_job(1, 0.25, 4.0, n));
+    task.push_back(fast_job(9, 1.5, 4.0, n));
+
+    return task;
+}

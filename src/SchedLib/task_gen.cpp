@@ -13,13 +13,14 @@ namespace
         if (i == LIGHT)
             return 1;
         else if (i == HEAVY)
-            return 4;
+            return 3;
         else
         {
-            if (j == HEAVY)
+            return 2;
+            /*if (j == HEAVY)
                 return 2;
             else
-                return 3;
+                return 3;*/
         }
 
     }

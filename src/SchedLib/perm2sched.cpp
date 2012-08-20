@@ -3,9 +3,129 @@
 namespace
 {
     typedef multimap<moment_t, cost_t> jobs_list_t;
+
+    void move_jobs_list(jobs_list_t &jobs_list, const moment_t offset)
+    {
+        jobs_list_t temp;
+        
+        for (jobs_list_t::const_iterator it = jobs_list.begin(); it != jobs_list.end(); ++it)
+            temp.insert(jobs_list_t::value_type(it->first + offset, it->second));
+
+        std::swap(jobs_list, temp);
+    }
+    
+    void add_last_job(const task_t &task, const perm_t &perm, sched_t &sched, jobs_list_t &jobs_list)
+    {
+        const size_t job = perm.back();
+        jobs_list.insert(jobs_list_t::value_type(moment_t(0), task[job].tweight));
+        sched[job] = task[job].due;
+    }
+
+    void add_free_hanging_job(const task_t &task, const perm_t &perm, const size_t pos, sched_t &sched, jobs_list_t &jobs_list)
+    {
+        const size_t job = perm[pos];
+        
+        move_jobs_list(jobs_list, sched[job] - task[job].due);
+        jobs_list.insert(jobs_list_t::value_type(moment_t(0), task[job].tweight));
+        sched[job] = task[job].due;
+    }
+
+    void add_early_job(const task_t &task, const perm_t &perm, const size_t pos, sched_t &sched, jobs_list_t &jobs_list)
+    {
+        const size_t job = perm[pos];
+
+        moment_t final_time = task[job].due;
+
+        bool reached_due = true;
+        cost_t gathered_penalty = -task[job].eweight;
+
+        moment_t last_push = 0;
+        jobs_list_t::iterator it;
+        for (it = jobs_list.begin(); it != jobs_list.end(); ++it)
+        {
+            // Job at its due date, no need to move further
+            if (it->first > task[job].due - sched[job])
+            {
+                break;
+            }
+
+            gathered_penalty += it->second;
+
+            // Enough penalty gathered
+            if (gathered_penalty > 0)
+            {
+                reached_due = false;
+                final_time = sched[job] + it->first;
+                ++it;
+                break;
+            }
+        }
+        
+        // Removing penalties for late jobs
+        jobs_list.erase(jobs_list.begin(), it);
+
+        move_jobs_list(jobs_list, sched[job] - final_time);
+
+        if (reached_due)
+        {
+            jobs_list.insert(jobs_list_t::value_type(moment_t(0), gathered_penalty + task[job].eweight + task[job].tweight));
+        }
+        else
+        {
+            const moment_t moment1 = 0;
+            const moment_t moment2 = task[job].due - final_time;
+
+            jobs_list.insert(jobs_list_t::value_type(moment1, gathered_penalty));
+            jobs_list.insert(jobs_list_t::value_type(moment2, task[job].eweight + task[job].tweight));
+        }
+
+        sched[job] = final_time;
+    }
+    
+
+    void add_job(const task_t &task, const perm_t &perm, const size_t pos, sched_t &sched, jobs_list_t &jobs_list)
+    {
+        const size_t job = perm[pos];
+        const size_t next_job = perm[pos + 1];
+
+        sched[job] = sched[next_job] - get_processing_time(task, perm, pos);
+
+        if (sched[job] > task[job].due)
+            add_free_hanging_job(task, perm, pos, sched, jobs_list);
+        else
+            add_early_job(task, perm, pos, sched, jobs_list);
+    }
+    
 }
 
+
 sched_t perm2sched(const task_t &task, const perm_t &perm)
+{
+    assert (!task.empty());
+    assert (task.size() == perm.size());
+
+    const size_t n = task.size();
+
+    jobs_list_t jobs_list;
+    sched_t sched(n);
+    
+    add_last_job(task, perm, sched, jobs_list);
+    for (int pos = n - 2; pos >= 0; --pos)
+        add_job(task, perm, pos, sched, jobs_list);
+    
+    for (size_t pos = 1; pos < n; ++pos)
+    {
+        const size_t job = perm[pos];
+        const size_t prev_job = perm[pos - 1];
+        sched[job] = std::max<moment_t>(sched[prev_job] + get_processing_time(task, perm, pos - 1), sched[job]);
+    }
+    
+    return sched;
+}
+
+
+#if 0
+sched_t perm2sched1(const task_t &task, const perm_t &perm)
 {
     assert (!task.empty());
     assert (task.size() == perm.size());
@@ -113,4 +233,4 @@ sched_t perm2sched(const task_t &task, const perm_t &perm)
     
     return sched;
 }
-
+#endif

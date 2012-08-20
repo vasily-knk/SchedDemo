@@ -67,10 +67,11 @@ void add_job(const task_t &task, const perm_t &perm, const size_t pos, sched_t &
     }
 }
 
-void slow_perm2sched(const task_t &task, const perm_t &perm, sched_t &out_sched)
+sched_t slow_perm2sched(const task_t &task, const perm_t &perm)
 {
     assert (task.size() == perm.size());
-    assert (task.size() == out_sched.size());
+
+    sched_t sched(task.size());
 
     /*moment_t last = 0;
     for (size_t i = 0; i < task.size(); ++i)
@@ -81,8 +82,10 @@ void slow_perm2sched(const task_t &task, const perm_t &perm, sched_t &out_sched)
     }*/
     for (int job = task.size() - 1; job >= 0; --job)
     {
-        add_job(task, perm, job, out_sched);
+        add_job(task, perm, job, sched);
     }
+    
+    return sched;
 }
 
 cost_t get_cost(const task_t &task, const sched_t &sched)
