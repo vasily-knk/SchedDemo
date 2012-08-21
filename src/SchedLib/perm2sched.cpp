@@ -127,7 +127,7 @@ void perm2sched_context::add_early_job(const size_t pos)
 
     assert(gathered_penalty > 0);
     final_time = std::max(final_time, task[job].min_bound);
-    //final_time = std::min(final_time, max_push);
+    final_time = std::min(final_time, original_time + max_push);
 
     sched[job] = final_time;
 

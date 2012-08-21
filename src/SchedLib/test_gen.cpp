@@ -27,11 +27,11 @@ task_t gen_task1()
 
     task_t task;
     //task.push_back(fast_job(0, 2.5, 2, n));
-    task.push_back(fast_job(1.0, 2.0, 2, n));
-    task.push_back(fast_job(0, 1.0, 2, n));
+    task.push_back(fast_job(0, 2.0, 2, n));
+    task.push_back(fast_job(-3, 1.0, 2, n));
     task.push_back(fast_job(0, 1.8, 2, n));
 
-    task[1].min_bound = 3.5;
+    task[1].max_bound = -2.5;
 
     return task;
 }
