@@ -74,7 +74,10 @@ sched_t slow_perm2sched(const task_t &task, const perm_t &perm);
 sched_t perm2sched(const task_t &task, const perm_t &perm);
 cost_t get_cost(const task_t &task, const sched_t &sched);
 cost_t calculate_cost(const task_t &task, const perm_t &perm);
-bool check_feasible(task_t &task, const perm_t &perm);
+bool check_feasible(const task_t &task, const perm_t &perm);
 
 typedef boost::function<perm_t(const task_t &, const perm_t &)> solver_t;
 
+task_t apply_permutation(const task_t &task, const perm_t &perm);
+
+perm_t due_dates_perm(const task_t &t);

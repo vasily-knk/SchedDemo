@@ -132,7 +132,6 @@ SchedDemo::~SchedDemo()
 
 void SchedDemo::updateCost()
 {
-	//slow_perm2sched(task_, perm_, sched_);
     sched_ = perm2sched(task_, perm_);
 
     reschedule_index_ = task_.size() - 1;

@@ -161,6 +161,9 @@ task_t planes_task_with_bounds(const size_t num_planes, const moment_t timespan,
         
         task[i].eweight = task[i].tweight = weights_distr(randgen);
     }
+
+    perm_t due_perm = due_dates_perm(task);
+    task = apply_permutation(task, due_perm);
     return task;
 }
 
