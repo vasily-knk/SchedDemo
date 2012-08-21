@@ -9,7 +9,7 @@ struct job_t
     moment_t due;
     vector<moment_t> spans;
     cost_t eweight, tweight;
-    moment_t min_bound;
+    moment_t min_bound, max_bound;
 };
 
 
