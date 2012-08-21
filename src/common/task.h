@@ -1,5 +1,4 @@
-#ifndef TASK_H
-#define TASK_H
+#pragma once
 
 typedef float moment_t;
 typedef float cost_t;
@@ -40,18 +39,6 @@ struct task_t : vector<job_t>
 
 typedef vector<moment_t> sched_t;
 
-/*struct sched_t : vector<moment_t> 
-{
-	sched_t(size_t n)
-		: vector<moment_t>(n)
-	{
-		for (iterator it = begin(); it != end(); ++it)
-			*it = (it - begin());
-	}
-};
-
-*/
-
 inline moment_t get_processing_time(const task_t &task, const perm_t &perm, const size_t pos)
 {
     if (pos == task.size() - 1)
@@ -60,12 +47,11 @@ inline moment_t get_processing_time(const task_t &task, const perm_t &perm, cons
     return task[perm[pos]].spans[perm[pos + 1]];
 }
 
-
 sched_t slow_perm2sched(const task_t &task, const perm_t &perm);
 sched_t perm2sched(const task_t &task, const perm_t &perm);
 cost_t get_cost(const task_t &task, const sched_t &sched);
 cost_t calculate_cost(const task_t &task, const perm_t &perm);
+bool check_feasible(task_t &task, const perm_t &perm);
 
 typedef boost::function<perm_t(const task_t &, const perm_t &)> solver_t;
 
-#endif // TASK_H

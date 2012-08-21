@@ -126,3 +126,41 @@ void planes_task1(const float timespan, task_t &out_task)
         std::fill(out_task[i].spans.begin(), out_task[i].spans.end(), span * 0.5f);
     }
 }
+
+task_t planes_task_with_bounds(const size_t num_planes, const moment_t timespan, const moment_t bound_timespan)
+{
+    mt19937 randgen(static_cast<unsigned int>(std::time(0)));
+    uniform_real_distribution<float> classes_distr(0, 1);
+    uniform_real_distribution<moment_t> bounds_distr(0, bound_timespan);
+    uniform_real_distribution<moment_t> dates_distr(0, timespan);
+    uniform_real_distribution<cost_t> weights_distr(0.2, 2.0);
+
+    task_t task(num_planes);
+
+    vector<plane_class> classes(num_planes);
+    for (size_t i = 0; i < num_planes; ++i)
+    {
+        float p = classes_distr(randgen);
+        if (p < 0.2)
+            classes[i] = LIGHT;
+        else if (p > 0.8)
+            classes[i] = HEAVY;
+        else
+            classes[i] = MEDIUM;
+    }
+
+    for (size_t i = 0; i < num_planes; ++i)
+        for (size_t j = 0; j < num_planes; ++j)
+            task[i].spans[j] = get_class_wait(classes[i], classes[j]);
+
+    for (size_t i = 0; i < num_planes; ++i)
+    {
+        task[i].due = dates_distr(randgen);
+        task[i].min_bound = task[i].due - bounds_distr(randgen);
+        task[i].max_bound = task[i].due + bounds_distr(randgen);
+        
+        task[i].eweight = task[i].tweight = weights_distr(randgen);
+    }
+    return task;
+}
+

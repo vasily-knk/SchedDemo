@@ -18,7 +18,7 @@ task_t apply_perm(const task_t &task, const perm_t &perm)
     return temp;
 }
 
-int main()
+int amain()
 {
     bool fail = false;
     
@@ -55,18 +55,31 @@ int main()
     return 0;         
 }
 
-task_t gen_task3();
 
-int amain()
+int main()
 {
-    const size_t n = 4;
-    task_t task = gen_task3();
-    perm_t perm(n);
-    sched_t sched1 = perm2sched(task, perm);
-    sched_t sched2 = slow_perm2sched(task, perm);;
+    task_t task(2);
 
-    const cost_t cost1 = get_cost(task, sched1);
-    const cost_t cost2 = get_cost(task, sched2);
-    cout << "Cost: " << get_cost(task, sched1) << ": " << get_cost(task, sched2) << endl;
+    size_t index = 0;
+
+    task[index].due = 0;
+    task[index].min_bound = 0;
+    task[index].max_bound = 0.5;
+    task[index].eweight = task[index].tweight = 2;
+    std::fill(task[index].spans.begin(), task[index].spans.end(), moment_t(2));
+    ++index;
+
+    task[index].due = 2;
+    task[index].min_bound = 2;
+    task[index].max_bound = 2.5;
+    task[index].eweight = task[index].tweight = 2;
+    std::fill(task[index].spans.begin(), task[index].spans.end(), moment_t(2));
+    ++index;
+
+    perm_t perm(task.size());
+    std::next_permutation(perm.begin(), perm.end());
+
+    cout << (check_feasible(task, perm) ? "OK" : "FAIL") << endl;
+
     return 0;
 }

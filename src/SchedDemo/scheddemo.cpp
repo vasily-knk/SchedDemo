@@ -110,9 +110,9 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
     
     sideLayout->addWidget(new QLabel("Cost:"), solver_slots_.size(), 0);
 
-    QPushButton *rescheduleBtn = new QPushButton("Reschedule");
+    /*QPushButton *rescheduleBtn = new QPushButton("Reschedule");
     sideLayout->addWidget(rescheduleBtn, solver_slots_.size() + 1, 0);
-    connect(rescheduleBtn, SIGNAL(clicked()), this, SLOT(reschedule()));
+    connect(rescheduleBtn, SIGNAL(clicked()), this, SLOT(reschedule()));*/
 
     
     cost_display_ = new QLabel("AAA");
@@ -165,14 +165,10 @@ void SchedDemo::updateOffset(size_t offset)
     setWindowTitle(str);
 }
 
-
-inline moment_t get_processing_time(const task_t &task, const perm_t &perm, const size_t pos);
-void add_job(const task_t &task, const perm_t &perm, const size_t pos, sched_t &out_sched);
-
 void SchedDemo::reschedule()
 {
 
-    add_job(task_, perm_, reschedule_index_, sched_);
+    /*add_job(task_, perm_, reschedule_index_, sched_);
     for (int pos = reschedule_index_ - 1; pos >= 0; --pos)
         sched_[perm_[pos]] = sched_[perm_[pos + 1]] - get_processing_time(task_, perm_, pos) - 1.0;
 
@@ -184,7 +180,7 @@ void SchedDemo::reschedule()
     else
         --reschedule_index_;
 
-    scene_->invalidateItems();
+    scene_->invalidateItems();*/
     
 }
 

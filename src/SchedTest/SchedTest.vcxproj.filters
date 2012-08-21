@@ -23,7 +23,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SchedTest.cpp">
+    <ClCompile Include="schedtest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
