@@ -41,7 +41,7 @@ int main()
         
             const cost_t cost1 = get_cost(task, sched1);
             const cost_t cost2 = get_cost(task, sched2);
-            if (fabs(cost2 - cost1) > 0.0001f)
+            if (cost2 >  cost1 + 0.001)
             {
                 cout << "Cost: " << cost1 << ": " << cost2 << endl;
                 ++fail_count;

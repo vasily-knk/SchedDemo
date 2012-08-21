@@ -37,68 +37,34 @@ namespace
         const moment_t original_time = sched[job];
         moment_t final_time = original_time;
 
-        //moment_t final_time = task[job].due;
+        const vector<job_t> &temp_size = task;
 
-        bool flag_gathered_enough_penalty = false, flag_reached_lower_bound = false;
-        bool reached_due = true;
+
+        jobs_list.insert(jobs_list_t::value_type(task[job].due - original_time, task[job].eweight + task[job].tweight));
+
         cost_t gathered_penalty = -task[job].eweight;
-
         jobs_list_t::iterator it;
-        
         for (it = jobs_list.begin(); it != jobs_list.end() && gathered_penalty <= 0; ++it)
         {
             const moment_t push = it->first;
-
-            if (push > task[job].min_bound - original_time)
-            {
-                if (push > task[job].due - original_time)
-                {
-                    final_time = task[job].due;
-                    break;
-                }
-
-
-                
-            }
-            
-            // Job at its due date, no need to move further
-
             gathered_penalty += it->second;
 
             // Enough penalty gathered
             if (gathered_penalty > 0)
             {
-                reached_due = false;
                 final_time = original_time + push;
-                flag_gathered_enough_penalty = true;
             }
         }
 
-        if (final_time < task[job].min_bound)
-        {
-            final_time = task[job].min_bound;
-        }
-        
+        assert(gathered_penalty > 0);
+
         sched[job] = final_time;
         
         // Removing penalties for late jobs
         jobs_list.erase(jobs_list.begin(), it);
 
-        move_jobs_list(jobs_list, final_time - original_time);
-
-        if (false && reached_due)
-        {
-            jobs_list.insert(jobs_list_t::value_type(moment_t(0), gathered_penalty + task[job].eweight + task[job].tweight));
-        }
-        else
-        {
-            const moment_t moment1 = 0;
-            const moment_t moment2 = std::max<moment_t>(task[job].due - final_time, 0);
-
-            jobs_list.insert(jobs_list_t::value_type(moment1, gathered_penalty));
-            jobs_list.insert(jobs_list_t::value_type(moment2, task[job].eweight + task[job].tweight));
-        }
-
+        move_jobs_list(jobs_list, -final_time + original_time);
+        jobs_list.insert(jobs_list_t::value_type(0, gathered_penalty));
     }
 
     void add_job(const task_t &task, const perm_t &perm, const size_t pos, sched_t &sched, jobs_list_t &jobs_list)

@@ -6,7 +6,7 @@
 
 namespace 
 {
-	const size_t DEFAULT_N = 10;
+	const size_t DEFAULT_N = 4;
 
 }
 void planes_task(float timespan, task_t &t);
@@ -32,12 +32,12 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
     , cost_(0)
     , reschedule_index_(DEFAULT_N - 1)
 {
-	const moment_t timespan = 30;
+	const moment_t timespan = 3;
 
     
-    //task_ = gen_task3();
+    task_ = gen_task1();
 
-    for (int i = 0; ; ++i)
+    /*for (int i = 0; ; ++i)
     {
         planes_task(timespan, task_);
 
@@ -55,9 +55,9 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
         
         if (i == 1000000)
             exit(1);
-    }
+    }*/
     //planes_task(timespan, task_);
-    //sched_ = perm2sched(task_, perm_);
+    sched_ = perm2sched(task_, perm_);
 
 	scene_ = new SchedScene(&task_, &perm_, &sched_);
 	
