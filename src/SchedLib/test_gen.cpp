@@ -4,6 +4,7 @@ void fast_job(const moment_t due, const cost_t weight, const moment_t proc, job_
 {
     job->due = due;
     job->eweight = job->tweight = weight;
+    job->min_bound = -10000;
     std::fill(job->spans.begin(), job->spans.end(), proc);
 }
 
@@ -12,6 +13,7 @@ job_t fast_job(const moment_t due, const cost_t weight, const moment_t proc, con
     job_t job;
     job.due = due;
     job.eweight = job.tweight = weight;
+    job.min_bound = -10000;
     job.spans.resize(n, proc);
 
     return job;
@@ -26,6 +28,8 @@ task_t gen_task1()
     task.push_back(fast_job(0, 2.0, 2, n));
     task.push_back(fast_job(0, 1.0, 2, n));
     task.push_back(fast_job(0, 1.8, 2, n));
+
+    task[1].min_bound = 3.0;
 
     return task;
 }
