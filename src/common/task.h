@@ -14,12 +14,35 @@ struct job_t
 
 struct perm_t : vector<size_t> 
 {
-	perm_t(size_t n)
+	perm_t()
+    {
+
+    }
+
+    perm_t(size_t n)
 		: vector<size_t>(n)
 	{
 		for (iterator it = begin(); it != end(); ++it)
 			*it = (it - begin());
 	}
+};
+
+class perm_generator
+{
+public:
+    typedef perm_t::value_type T;
+
+    perm_generator(const T& start_value = 0) : val_(start_value)
+    {
+
+    }
+
+    T operator() ()
+    {
+        return val_++;
+    }
+private:
+    T val_;
 };
 
 

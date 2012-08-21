@@ -81,5 +81,12 @@ int main()
 
     cout << (check_feasible(task, perm) ? "OK" : "FAIL") << endl;
 
+    perm_t perm1(2);
+    perm1.resize(10);
+    std::generate(perm1.begin(), perm1.end(), perm_generator());
+    std::next_permutation(perm1.begin(), perm1.end());
+    std::copy(perm1.begin(), perm1.end(), std::ostream_iterator<perm_t::value_type>(cout, " "));
+    cout << endl;
+
     return 0;
 }

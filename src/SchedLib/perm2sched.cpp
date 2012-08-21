@@ -33,14 +33,12 @@ namespace {
         , perm(perm)
         , sched(task.size())
     {
-
+        assert (!task.empty());
+        assert (task.size() == perm.size());
     }
 
     const sched_t &perm2sched_context::calculate_sched()
     {
-        assert (!task.empty());
-        assert (task.size() == perm.size());
-
         const size_t n = task.size();
 
         sched.resize(n, 0);

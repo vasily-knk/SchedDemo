@@ -13,10 +13,7 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     void updateData(qreal width, qreal height);
-    void setColor(QColor color)
-    {
-        color_ = color;
-    }
+    void setColor(QColor color) {color_ = color;}
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);

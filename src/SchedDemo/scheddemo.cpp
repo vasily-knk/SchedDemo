@@ -4,12 +4,8 @@
 
 #include "sliding_window.h"
 
-namespace 
-{
-	const size_t DEFAULT_N = 3;
-
-}
 void planes_task(float timespan, task_t &t);
+task_t planes_task_with_bounds(const size_t num_planes, const moment_t timespan, const moment_t bound_timespan);
 
 perm_t order_solver(const task_t &t, const perm_t &src);
 perm_t due_dates_solver(const task_t &t, const perm_t &src);
@@ -26,16 +22,18 @@ task_t gen_task3();
 
 SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
 	: QWidget(parent, flags)
-	, task_ (DEFAULT_N)
+	/*, task_ (DEFAULT_N)
 	, perm_ (DEFAULT_N)
 	, sched_(DEFAULT_N)
     , cost_(0)
-    , reschedule_index_(DEFAULT_N - 1)
+    , reschedule_index_(DEFAULT_N - 1)*/
 {
-	const moment_t timespan = 3;
+    const size_t num_planes = 30;
 
-    
-    task_ = gen_task1();
+    task_ = planes_task_with_bounds(num_planes, 60, 10);
+    perm_.resize(num_planes);
+    std::generate(perm_.begin(), perm_.end(), perm_generator());
+
 
     /*for (int i = 0; ; ++i)
     {
@@ -118,8 +116,6 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
     cost_display_ = new QLabel("AAA");
     sideLayout->addWidget(cost_display_, solver_slots_.size(), 1);
     sidePanel->setLayout(sideLayout);
-
-
 
     layout->addWidget(view, 0, 0);
     layout->addWidget(sidePanel, 0, 1);

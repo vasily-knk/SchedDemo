@@ -54,6 +54,9 @@ public:
 private:
     const size_t window_size_;
     const callback_t callback_;
+
+private:
+    sliding_window_solver &operator=(const sliding_window_solver&);
 };
 
 #endif

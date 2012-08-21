@@ -60,8 +60,10 @@ SchedScene::SchedScene(task_t *task, perm_t *perm, sched_t *sched, QObject *pare
 		jobs_[i] = new SchedItem(this, i);
 		addItem(jobs_[i]);
 
-		lbLines_ [i] = addLine(QLineF(), normalLine);
-		ubLines_ [i] = NULL;
+		lbLines_ [i] = addLine(QLineF(), thickLine);
+        lbLines_ [i]->setVisible(false);
+		ubLines_ [i] = addLine(QLineF(), thickLine);
+        ubLines_ [i]->setVisible(false);
 		dueLines_[i] = addLine(QLineF(), normalLine);
 	}
 
@@ -168,7 +170,8 @@ void SchedScene::showTRect(size_t item)
     else
         tRect_->setVisible(false);
 
-	//lbLines_[item]->setPen(thickLine);
+	lbLines_[item]->setVisible(true);
+    ubLines_[item]->setVisible(true);
 	dueLines_[item]->setPen(thickLine);
 
     //tRect_->update();
@@ -178,7 +181,8 @@ void SchedScene::hideTRect(size_t item)
 {
     tRect_->setVisible(false);
 
-	//lbLines_[item]->setPen(normalLine);
+    lbLines_[item]->setVisible(false);
+    ubLines_[item]->setVisible(false);
 	dueLines_[item]->setPen(normalLine);
 }
 
@@ -212,7 +216,8 @@ void SchedScene::updateItems()
 		const size_t index = (*perm_)[i];
         jobs_[i]->setPos(time2coord((*sched_)[index]), JOBS_HEIGHT);
 
-		//lbLines_ [i]->setLine(time2coord((*sched_)[index]), JOBS_HEIGHT, time2coord((*task_)[index].min_bound), DATES_HEIGHT);
+		lbLines_ [i]->setLine(time2coord((*sched_)[index]), JOBS_HEIGHT, time2coord((*task_)[index].min_bound), DATES_HEIGHT);
+        ubLines_ [i]->setLine(time2coord((*sched_)[index]), JOBS_HEIGHT, time2coord((*task_)[index].max_bound), DATES_HEIGHT);
 		dueLines_[i]->setLine(time2coord((*sched_)[index]), JOBS_HEIGHT, time2coord((*task_)[index].due),       DATES_HEIGHT);
 	}
 
