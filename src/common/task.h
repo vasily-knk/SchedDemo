@@ -64,8 +64,8 @@ typedef vector<moment_t> sched_t;
 
 inline moment_t get_processing_time(const task_t &task, const perm_t &perm, const size_t pos)
 {
-    if (pos == task.size() - 1)
-        return 0;
+    if (pos == perm.size() - 1)
+        return task[perm[pos]].spans.front();
 
     return task[perm[pos]].spans[perm[pos + 1]];
 }
@@ -81,3 +81,4 @@ typedef boost::function<perm_t(const task_t &, const perm_t &)> solver_t;
 task_t apply_permutation(const task_t &task, const perm_t &perm);
 
 perm_t due_dates_perm(const task_t &t);
+perm_t select_sub_task(const task_t &src_task, const sched_t &sched, const moment_t start, const moment_t end);

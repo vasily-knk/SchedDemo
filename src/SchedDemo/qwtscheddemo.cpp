@@ -6,24 +6,24 @@ namespace {
 class Histogram: public QwtPlotHistogram
 {
 public:
-    Histogram(const QString &, const QColor &);
+    Histogram(const QString &, const QColor &, int alpha);
 
-    void setColor(const QColor &);
+    void setColor(const QColor &, int alpha);
     void setValues(uint numValues, const double *);
 };
 
-Histogram::Histogram(const QString &title, const QColor &symbolColor):
+Histogram::Histogram(const QString &title, const QColor &symbolColor, const int alpha):
 QwtPlotHistogram(title)
 {
     setStyle(QwtPlotHistogram::Columns);
 
-    setColor(symbolColor);
+    setColor(symbolColor, alpha);
 }
 
-void Histogram::setColor(const QColor &symbolColor)
+void Histogram::setColor(const QColor &symbolColor, const int alpha)
 {
     QColor color = symbolColor;
-    color.setAlpha(200);
+    color.setAlpha(alpha);
 
     setPen(QPen(Qt::black));
     setBrush(QBrush(color));
@@ -81,27 +81,36 @@ void QwtSchedDemo::initGrid()
 
 void QwtSchedDemo::initData()
 {
-    Histogram *hist_min_bounds = new Histogram("Bounds", Qt::darkGray);
+    Histogram *hist_min_bounds = new Histogram("Bounds", Qt::darkGray, 255);
     hist_min_bounds->attach(this);
     hist_min_bounds_ = hist_min_bounds;
 
-    Histogram *hist_max_bounds = new Histogram("Bounds", Qt::darkGray);
+    Histogram *hist_max_bounds = new Histogram("Bounds", Qt::darkGray, 255);
     hist_max_bounds->attach(this);
     hist_max_bounds_ = hist_max_bounds;
 
-    Histogram *hist_planes = new Histogram("Planes", Qt::blue);
+    Histogram *hist_planes = new Histogram("Planes", Qt::blue, 150);
     hist_planes->attach(this);
     hist_planes_ = hist_planes;
+
+    Histogram *hist_planes_subtask = new Histogram("Planes", Qt::red, 150);
+    hist_planes_subtask->attach(this);
+    hist_planes_subtask_ = hist_planes_subtask;
 }
 
-void QwtSchedDemo::updateData(const task_t &task, const perm_t &perm, const sched_t &sched)
+void QwtSchedDemo::updateData(const task_t &task, const perm_t &perm, const sched_t &sched, const size_t subtask_begin_, const size_t subtask_end_)
 {
     assert(task.size() == sched.size());
+    assert(task.size() == perm.size());
+    assert(subtask_end_ >= subtask_begin_);
+    assert(subtask_end_ <= perm.size());
+
     const size_t n = task.size();
 
     QVector<QwtIntervalSample> samples_min_bounds(n);
     QVector<QwtIntervalSample> samples_max_bounds(n);
     QVector<QwtIntervalSample> samples_planes(n);
+    QVector<QwtIntervalSample> samples_planes_subtask(subtask_end_ - subtask_begin_);
     
     for (size_t pos = 0; pos < n; ++pos)
     {
@@ -113,12 +122,20 @@ void QwtSchedDemo::updateData(const task_t &task, const perm_t &perm, const sche
         samples_min_bounds[pos] = QwtIntervalSample(task[job].min_bound - task[job].due, interval);
         samples_max_bounds[pos] = QwtIntervalSample(task[job].max_bound - task[job].due, interval);
         samples_planes    [pos] = QwtIntervalSample(sched[job]          - task[job].due, interval);
+        //samples_planes_subtask[pos - subtask_begin_] = QwtIntervalSample();
+
+        if (pos >= subtask_begin_ && pos < subtask_end_)
+        {
+            samples_planes_subtask[pos - subtask_begin_] = QwtIntervalSample();
+            std::swap(samples_planes[pos], samples_planes_subtask[pos - subtask_begin_]);
+        }
     }
 
     hist_min_bounds_->setData(new QwtIntervalSeriesData(samples_min_bounds));
     hist_max_bounds_->setData(new QwtIntervalSeriesData(samples_max_bounds));
     hist_planes_    ->setData(new QwtIntervalSeriesData(samples_planes));
-
+    hist_planes_subtask_->setData(new QwtIntervalSeriesData(samples_planes_subtask));
+    
     replot();
 }
 

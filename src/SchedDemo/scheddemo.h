@@ -41,6 +41,8 @@ private:
 	perm_t perm_;
 	sched_t sched_;
 
+    size_t subtask_begin_, subtask_end_;
+    
     cost_t cost_;
 
 	SchedScene *scene_;

@@ -133,7 +133,7 @@ task_t planes_task_with_bounds(const size_t num_planes, const moment_t timespan,
     uniform_real_distribution<float> classes_distr(0, 1);
     uniform_real_distribution<moment_t> bounds_distr(bound_timespan * 0.7, bound_timespan);
     uniform_real_distribution<moment_t> dates_distr(0, timespan);
-    uniform_real_distribution<cost_t> weights_distr(0.2, 2.0);
+    uniform_real_distribution<cost_t> weights_distr(0.2, 1.0);
 
     task_t task(num_planes);
 

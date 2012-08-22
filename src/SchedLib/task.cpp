@@ -50,10 +50,11 @@ bool check_feasible(const task_t &task, const perm_t &perm)
 
 task_t apply_permutation(const task_t &task, const perm_t &perm)
 {
-    task_t temp(task.size());
+    task_t temp(perm.size());
     for (size_t i = 0; i < perm.size(); ++i)
     {
         temp[i] = task[perm[i]];
+        temp[i].spans.resize(perm.size());
         for (size_t j = 0; j < perm.size(); ++j)
             temp[i].spans[j] = task[perm[i]].spans[perm[j]];
     }
@@ -68,4 +69,17 @@ perm_t due_dates_perm(const task_t &t)
         return (t[i].due < t[j].due);
     });
     return perm;
+}
+
+perm_t select_sub_task(const task_t &src_task, const sched_t &sched, const moment_t start, const moment_t end)
+{
+    perm_t mappings;
+    
+    for (size_t i = 0; i < src_task.size(); ++i)
+    {
+        if (sched[i] >= start && sched[i] < end)
+            mappings.push_back(i);
+    }
+
+    return mappings;
 }

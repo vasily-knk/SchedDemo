@@ -29,11 +29,15 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
     , cost_(0)
     , reschedule_index_(DEFAULT_N - 1)*/
 {
-    const size_t num_planes = 40;
+    const size_t num_planes = 100;
 
-    task_ = planes_task_with_bounds(num_planes, 80, 20);
+    task_ = planes_task_with_bounds(num_planes, 210, 20);
     perm_.resize(num_planes);
     std::generate(perm_.begin(), perm_.end(), perm_generator());
+    sched_ = perm2sched(task_, perm_);
+
+    subtask_begin_ = 25;
+    subtask_end_ = 50;
 
 
     /*for (int i = 0; ; ++i)
@@ -56,7 +60,6 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
             exit(1);
     }*/
     //planes_task(timespan, task_);
-    sched_ = perm2sched(task_, perm_);
 
 	scene_ = new SchedScene(&task_, &perm_, &sched_);
 	
@@ -145,7 +148,7 @@ void SchedDemo::updateCost()
 	const cost_t cost = get_cost(task_, sched_);
     cost_display_->setText(QString::number(cost));
 
-    qwt_demo_->updateData(task_, perm_, sched_)    ;
+    qwt_demo_->updateData(task_, perm_, sched_, subtask_begin_, subtask_end_);
 }
 
 void SchedDemo::runSolver(int i)
@@ -153,6 +156,11 @@ void SchedDemo::runSolver(int i)
     //solver_slots_[i].lbl->setText (QString::number(rand()));
     if (solver_slots_[i].solver == NULL)
         return;
+
+    perm_t mappings(subtask_end_ - subtask_begin_);
+    std::copy(perm_.begin() + subtask_begin_, perm_.begin() + subtask_end_, mappings.begin());
+
+    task_t subtask = apply_permutation(task_, mappings);
 
     perm_ = solver_slots_[i].solver(task_, perm_);
     updateCost();
