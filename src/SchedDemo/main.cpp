@@ -97,7 +97,7 @@ perm_t annealing_solver(const task_t &t, const perm_t &src)
     perm_t dst(src);
     const float initial = 10000;
     const float frozen = 0.1f;
-    const float cooling = 0.99f;
+    const float cooling = 0.9f;
     const size_t n_iter = 100;
 
     for (float temperature = initial; temperature > frozen; temperature *= cooling)

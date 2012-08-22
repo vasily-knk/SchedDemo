@@ -32,9 +32,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="perm2sched.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="task.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -44,7 +41,13 @@
     <ClCompile Include="test_gen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="slow_and_broken_perm2sched.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="slow_perm2sched.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="perm2sched.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

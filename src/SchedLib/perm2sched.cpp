@@ -10,7 +10,9 @@ namespace {
 
         const sched_t &get_sched() const {return sched;}
     private:
-        void move_jobs_list(moment_t offset);
+        void move_jobs_list(moment_t move);
+        void insert_job(moment_t moment, cost_t cost);
+
         void add_last_job();
         void add_free_hanging_job(const size_t pos);
         void add_early_job(const size_t pos);
@@ -22,6 +24,7 @@ namespace {
         const perm_t &perm;
         sched_t sched;
         jobs_list_t jobs_list;
+        moment_t offset;
         moment_t max_push;
 
     private:
@@ -43,6 +46,7 @@ namespace {
 
         sched.resize(n, 0);
         jobs_list.clear();
+        offset = 0;
 
         add_last_job();
         for (int pos = n - 2; pos >= 0; --pos)
@@ -61,22 +65,22 @@ namespace {
 
 
 
-    void perm2sched_context::move_jobs_list(const moment_t offset)
+    void perm2sched_context::move_jobs_list(const moment_t move)
     {
-        jobs_list_t temp;
+        offset += move;
+        max_push += move;
+    }
 
-        for (jobs_list_t::const_iterator it = jobs_list.begin(); it != jobs_list.end(); ++it)
-            temp.insert(jobs_list_t::value_type(it->first + offset, it->second));
-
-        std::swap(jobs_list, temp);
-
-        max_push += offset;
+    void perm2sched_context::insert_job(moment_t moment, cost_t cost)
+    {
+        const jobs_list_t::value_type value(moment - offset, cost);
+        jobs_list.insert(value);
     }
 
     void perm2sched_context::add_last_job()
     {
         const size_t job = perm.back();
-        jobs_list.insert(jobs_list_t::value_type(moment_t(0), task[job].tweight));
+        insert_job(moment_t(0), task[job].tweight);
         sched[job] = task[job].due;
         max_push = task[job].max_bound - sched[job];
     }
@@ -101,7 +105,7 @@ namespace {
         const size_t job = perm[pos];
 
         move_jobs_list(sched[job] - task[job].due);
-        jobs_list.insert(jobs_list_t::value_type(moment_t(0), task[job].tweight));
+        insert_job(moment_t(0), task[job].tweight);
         sched[job] = task[job].due;
     }
 
@@ -112,13 +116,13 @@ namespace {
         const moment_t original_time = sched[job];
         moment_t final_time = original_time;
 
-        jobs_list.insert(jobs_list_t::value_type(task[job].due - original_time, task[job].eweight + task[job].tweight));
+        insert_job(task[job].due - original_time, task[job].eweight + task[job].tweight);
 
         cost_t gathered_penalty = -task[job].eweight;
         jobs_list_t::iterator it;
         for (it = jobs_list.begin(); it != jobs_list.end(); ++it)
         {
-            const moment_t push = it->first;
+            const moment_t push = it->first + offset;
 
             if (gathered_penalty > 0 && push > task[job].min_bound - original_time)
                 break;
@@ -138,7 +142,7 @@ namespace {
         jobs_list.erase(jobs_list.begin(), it);
 
         move_jobs_list(-final_time + original_time);
-        jobs_list.insert(jobs_list_t::value_type(moment_t(0), gathered_penalty));
+        insert_job(moment_t(0), gathered_penalty);
     }
 
 }
@@ -148,4 +152,3 @@ sched_t perm2sched(const task_t &task, const perm_t &perm)
     perm2sched_context context(task, perm);
     return context.calculate_sched();
 }
-

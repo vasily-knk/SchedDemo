@@ -5,8 +5,10 @@
 
 
 void planes_task(float timespan, task_t &out_task);
+sched_t slow_perm2sched(const task_t &task, const perm_t &perm);
 sched_t perm2sched(const task_t &task, const perm_t &perm);
 task_t gen_task1();
+task_t planes_task_with_bounds(const size_t num_planes, const moment_t timespan, const moment_t bound_timespan);
 
 task_t apply_perm(const task_t &task, const perm_t &perm)
 {
@@ -18,17 +20,16 @@ task_t apply_perm(const task_t &task, const perm_t &perm)
     return temp;
 }
 
-int amain()
+int main()
 {
     bool fail = false;
     
-    const size_t n = 6;
+    const size_t n = 20;
     int fail_count = 0;
     
     for (int i = 0; i < 100; ++i)
     {
-        task_t task(n);
-        planes_task(5, task);
+        const task_t task = planes_task_with_bounds(n, 10, 10);
 
         perm_t perm(n);
 
@@ -36,14 +37,14 @@ int amain()
         {
             std::random_shuffle(perm.begin(), perm.end());
 
-            sched_t sched1 = perm2sched(task, perm);
-            sched_t sched2 = slow_perm2sched(task, perm);
+            const sched_t sched = perm2sched(task, perm);
+            const sched_t slow_sched = slow_perm2sched(task, perm);
         
-            const cost_t cost1 = get_cost(task, sched1);
-            const cost_t cost2 = get_cost(task, sched2);
-            if (cost2 >  cost1 + 0.001)
+            const cost_t cost = get_cost(task, sched);
+            const cost_t slow_cost = get_cost(task, slow_sched);
+            if (fabs(slow_cost - cost) > 0.001)
             {
-                cout << "Cost: " << cost1 << ": " << cost2 << endl;
+                cout << "Cost: " << cost << ": " << slow_cost << endl;
                 ++fail_count;
             }
         }
@@ -56,7 +57,7 @@ int amain()
 }
 
 
-int main()
+int bmain()
 {
     task_t task(2);
 

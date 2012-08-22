@@ -28,9 +28,9 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
     , cost_(0)
     , reschedule_index_(DEFAULT_N - 1)*/
 {
-    const size_t num_planes = 30;
+    const size_t num_planes = 50;
 
-    task_ = planes_task_with_bounds(num_planes, 60, 10);
+    task_ = planes_task_with_bounds(num_planes, 80, 20);
     perm_.resize(num_planes);
     std::generate(perm_.begin(), perm_.end(), perm_generator());
 
