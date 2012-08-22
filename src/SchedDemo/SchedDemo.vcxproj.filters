@@ -79,6 +79,18 @@
     <ClCompile Include="GeneratedFiles\Profiling\moc_scheddemo.cpp">
       <Filter>Generated Files\Profiling</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_qwtscheddemo.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Profiling\moc_qwtscheddemo.cpp">
+      <Filter>Generated Files\Profiling</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_qwtscheddemo.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="qwtscheddemo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="scheddemo.h">
@@ -88,6 +100,9 @@
       <Filter>Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="schedscene.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="qwtscheddemo.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>

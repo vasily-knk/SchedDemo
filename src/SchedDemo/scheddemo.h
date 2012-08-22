@@ -2,6 +2,7 @@
 #define SCHEDDEMO_H
 
 class SchedScene;
+class QwtSchedDemo;
 
 class SchedDemo : public QWidget
 {
@@ -45,6 +46,8 @@ private:
 	SchedScene *scene_;
     vector<solver_slot_t> solver_slots_;
     QLabel *cost_display_;
+
+    QwtSchedDemo *qwt_demo_;
 
     size_t reschedule_index_;
 

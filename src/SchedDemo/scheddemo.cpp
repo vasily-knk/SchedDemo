@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "scheddemo.h"
 #include "schedscene.h"
+#include "qwtscheddemo.h"
 
 #include "sliding_window.h"
 
@@ -28,7 +29,7 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
     , cost_(0)
     , reschedule_index_(DEFAULT_N - 1)*/
 {
-    const size_t num_planes = 50;
+    const size_t num_planes = 40;
 
     task_ = planes_task_with_bounds(num_planes, 80, 20);
     perm_.resize(num_planes);
@@ -118,7 +119,11 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
     sidePanel->setLayout(sideLayout);
 
     layout->addWidget(view, 0, 0);
-    layout->addWidget(sidePanel, 0, 1);
+
+    qwt_demo_ = new QwtSchedDemo(this);
+    layout->addWidget(qwt_demo_, 1, 0);
+
+    layout->addWidget(sidePanel, 0, 1, 2, 1);
 
 	setLayout(layout);
     scene_->invalidateItems();
@@ -139,6 +144,8 @@ void SchedDemo::updateCost()
 
 	const cost_t cost = get_cost(task_, sched_);
     cost_display_->setText(QString::number(cost));
+
+    qwt_demo_->updateData(task_, perm_, sched_)    ;
 }
 
 void SchedDemo::runSolver(int i)
