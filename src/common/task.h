@@ -73,6 +73,9 @@ inline moment_t get_processing_time(const task_t &task, const perm_t &perm, cons
 sched_t slow_and_broken_perm2sched(const task_t &task, const perm_t &perm);
 sched_t perm2sched(const task_t &task, const perm_t &perm);
 cost_t get_cost(const task_t &task, const sched_t &sched);
+cost_t get_cost_partial(const task_t &task, const sched_t &sched, const perm_t &perm, const size_t start, const size_t end);
+
+
 cost_t calculate_cost(const task_t &task, const perm_t &perm);
 bool check_feasible(const task_t &task, const perm_t &perm);
 

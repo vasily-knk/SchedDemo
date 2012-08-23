@@ -36,7 +36,7 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
     std::generate(perm_.begin(), perm_.end(), perm_generator());
     sched_ = perm2sched(task_, perm_);
 
-    subtask_begin_ = 25;
+    subtask_begin_ = 0;
     subtask_end_ = 50;
 
 
@@ -78,6 +78,8 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
 
     solver_slots_.push_back(solver_slot_t("Original", order_solver));
     solver_slots_.push_back(solver_slot_t("Due dates", due_dates_solver));
+    selected_solver_ = solver_slots_.size() - 1;
+
     solver_slots_.push_back(solver_slot_t("Random pair", boost::bind(random_solver, _1, _2, 10000)));
     solver_slots_.push_back(solver_slot_t("Best pair", all_pairs_solver));
     solver_slots_.push_back(solver_slot_t("Best triple", boost::bind(all_triples_solver, _1, _2, 7)));
@@ -116,6 +118,13 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
     sideLayout->addWidget(rescheduleBtn, solver_slots_.size() + 1, 0);
     connect(rescheduleBtn, SIGNAL(clicked()), this, SLOT(reschedule()));*/
 
+    QPushButton *advanceBtn = new QPushButton("Advance");
+    sideLayout->addWidget(advanceBtn, solver_slots_.size() + 1, 0);
+    connect(advanceBtn, SIGNAL(clicked()), this, SLOT(advanceSubtask()));
+
+    QPushButton *resetBtn = new QPushButton("Reset");
+    sideLayout->addWidget(resetBtn, solver_slots_.size() + 2, 0);
+    connect(resetBtn, SIGNAL(clicked()), this, SLOT(resetSubtask()));
     
     cost_display_ = new QLabel("AAA");
     sideLayout->addWidget(cost_display_, solver_slots_.size(), 1);
@@ -140,32 +149,61 @@ SchedDemo::~SchedDemo()
 
 void SchedDemo::updateCost()
 {
-    sched_ = perm2sched(task_, perm_);
+    //sched_ = perm2sched(task_, perm_);
 
     reschedule_index_ = task_.size() - 1;
     scene_->current.reset();
 
-	const cost_t cost = get_cost(task_, sched_);
+	const cost_t cost = get_cost_partial(task_, sched_, perm_, 0, subtask_end_);
     cost_display_->setText(QString::number(cost));
 
     qwt_demo_->updateData(task_, perm_, sched_, subtask_begin_, subtask_end_);
 }
 
-void SchedDemo::runSolver(int i)
+void SchedDemo::runSolver(const int solver_index)
 {
     //solver_slots_[i].lbl->setText (QString::number(rand()));
-    if (solver_slots_[i].solver == NULL)
+    if (solver_slots_[solver_index].solver == NULL)
         return;
 
+    selected_solver_ = solver_index;
+
     perm_t mappings(subtask_end_ - subtask_begin_);
+    
+    if (mappings.empty())
+        return;
+
     std::copy(perm_.begin() + subtask_begin_, perm_.begin() + subtask_end_, mappings.begin());
 
     task_t subtask = apply_permutation(task_, mappings);
 
-    perm_ = solver_slots_[i].solver(task_, perm_);
+    if (subtask_begin_ > 0)
+    {
+        const moment_t total_min_bound = sched_[perm_[subtask_begin_ - 1]] + get_processing_time(task_, perm_, subtask_begin_ - 1);
+        for (task_t::iterator it = subtask.begin(); it != subtask.end(); ++it)
+        {
+            it->min_bound = std::max(it->min_bound, total_min_bound);
+            it->due = std::max(it->due, it->min_bound);
+        }
+    }
+
+
+    perm_t subperm(mappings.size());
+    std::generate(subperm.begin(), subperm.end(), perm_generator());
+
+    subperm = solver_slots_[solver_index].solver(subtask, subperm);
+    const sched_t subsched = perm2sched(subtask, subperm);
+    
+    for (size_t i = subtask_begin_; i < subtask_end_; ++i)
+    {
+        perm_[i] = mappings[subperm[i - subtask_begin_]];
+        sched_[perm_[i]] = subsched[subperm[i - subtask_begin_]];
+    }
+
+    //perm_ = solver_slots_[i].solver(task_, perm_);
     updateCost();
-    const cost_t cost = get_cost(task_, sched_);
-    solver_slots_[i].lbl->setText(QString::number(cost));
+    const cost_t cost = get_cost_partial(task_, sched_, perm_, 0, subtask_end_);
+    solver_slots_[solver_index].lbl->setText(QString::number(cost));
     scene_->invalidateItems();
 }
 
@@ -192,5 +230,21 @@ void SchedDemo::reschedule()
 
     scene_->invalidateItems();*/
     
+}
+
+void SchedDemo::advanceSubtask()
+{
+    subtask_begin_ = std::min(task_.size(), subtask_begin_ + 1);
+    subtask_end_ = std::min(task_.size(), subtask_end_ + 1);
+    runSolver(selected_solver_);
+    updateCost();
+}
+
+void SchedDemo::resetSubtask()
+{
+    subtask_begin_ = 0;
+    subtask_end_ = std::min<size_t>(task_.size(), 50);
+    runSolver(selected_solver_);
+    updateCost();
 }
 

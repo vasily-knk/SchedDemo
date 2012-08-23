@@ -18,6 +18,8 @@ public:
 protected slots:
     void runSolver(int i);
     void reschedule();
+    void advanceSubtask();
+    void resetSubtask();
 private:
     struct solver_slot_t
     {
@@ -47,6 +49,7 @@ private:
 
 	SchedScene *scene_;
     vector<solver_slot_t> solver_slots_;
+    size_t selected_solver_;
     QLabel *cost_display_;
 
     QwtSchedDemo *qwt_demo_;

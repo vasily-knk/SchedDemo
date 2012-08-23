@@ -105,7 +105,7 @@ void QwtSchedDemo::updateData(const task_t &task, const perm_t &perm, const sche
     assert(subtask_end_ >= subtask_begin_);
     assert(subtask_end_ <= perm.size());
 
-    const size_t n = task.size();
+    const size_t n = subtask_end_;
 
     QVector<QwtIntervalSample> samples_min_bounds(n);
     QVector<QwtIntervalSample> samples_max_bounds(n);

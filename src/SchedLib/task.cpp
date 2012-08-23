@@ -19,6 +19,26 @@ cost_t get_cost(const task_t &task, const sched_t &sched)
     return cost;
 }
 
+
+cost_t get_cost_partial(const task_t &task, const sched_t &sched, const perm_t &perm, const size_t start, const size_t end)
+{
+    cost_t cost = 0;
+    for (size_t pos = start; pos < end; ++pos)
+    {
+        const size_t job = perm[pos];
+        
+        if (sched[job] < task[job].min_bound || sched[job] > task[job].max_bound)
+            return std::numeric_limits<cost_t>::max();
+
+        const moment_t deviation = std::abs(sched[job] - task[job].due);
+        if (sched[job] - task[job].due > 0)
+            cost += task[job].tweight * deviation;
+        else
+            cost += task[job].eweight * deviation;
+    }
+    return cost;
+}
+
 cost_t calculate_cost(const task_t &task, const perm_t &perm)
 {
     if (!check_feasible(task, perm))
