@@ -9,17 +9,22 @@ class SchedDemo : public QWidget
 	Q_OBJECT
 
 public:
-	SchedDemo(QWidget *parent = 0, Qt::WFlags flags = 0);
+	SchedDemo(size_t num_planes, moment_t timespan, moment_t bounds_span, moment_t window_span, QWidget *parent = NULL, Qt::WFlags flags = 0);
 	~SchedDemo();
 
 	void updateCost();
     void updateOffset(size_t offset);
+    void updateSubtask();
 
 protected slots:
     void runSolver(int i);
     void reschedule();
     void advanceSubtask();
     void resetSubtask();
+    void playDemo();
+    void pauseDemo();
+    void resetDemo();
+    void playTick();
 private:
     struct solver_slot_t
     {
@@ -42,9 +47,12 @@ private:
     task_t task_;
 	perm_t perm_;
 	sched_t sched_;
-    perm_t original_perm_;
+    perm_t original_perm_, due_dates_perm_;
 
+    moment_t window_pos_, window_span_;
     size_t subtask_begin_, subtask_end_;
+
+    QTimer *play_timer_;
     
     cost_t cost_;
 

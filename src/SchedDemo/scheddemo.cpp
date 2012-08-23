@@ -21,49 +21,21 @@ task_t gen_task1();
 task_t gen_task2();
 task_t gen_task3();
 
-SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
+SchedDemo::SchedDemo(const size_t num_planes, const moment_t timespan, const moment_t bounds, const moment_t window_span, QWidget *parent/* = 0*/, Qt::WFlags flags/* = 0*/)
 	: QWidget(parent, flags)
-	/*, task_ (DEFAULT_N)
-	, perm_ (DEFAULT_N)
-	, sched_(DEFAULT_N)
-    , cost_(0)
-    , reschedule_index_(DEFAULT_N - 1)*/
+    , window_pos_(0)
+    , window_span_(window_span)
+    , subtask_begin_(0)
+    , subtask_end_(0)
 {
-    const size_t num_planes = 100;
-
-    task_ = planes_task_with_bounds(num_planes, 210, 20);
+    task_ = planes_task_with_bounds(num_planes, timespan, bounds);    
     original_perm_.resize(num_planes);
     std::generate(original_perm_.begin(), original_perm_.end(), perm_generator());
 
+    due_dates_perm_ = due_dates_perm(task_);
+
     perm_ = original_perm_;
     sched_ = perm2sched(task_, perm_);
-    subtask_begin_ = 0;
-    subtask_end_ = std::min<size_t>(task_.size(), 50);
-
-    subtask_begin_ = 0;
-    subtask_end_ = 50;
-
-
-    /*for (int i = 0; ; ++i)
-    {
-        planes_task(timespan, task_);
-
-        const sched_t fast_sched = perm2sched(task_, perm_);
-        const sched_t slow_sched = slow_perm2sched(task_, perm_);
-
-        const cost_t fast_cost = get_cost(task_, fast_sched);
-        const cost_t slow_cost = get_cost(task_, slow_sched);
-
-        if (fast_cost - slow_cost > 0.001)
-        {
-            sched_ = fast_sched;
-            break;
-        }
-        
-        if (i == 1000000)
-            exit(1);
-    }*/
-    //planes_task(timespan, task_);
 
 	scene_ = new SchedScene(&task_, &perm_, &sched_);
 	
@@ -76,14 +48,9 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
 	QGraphicsView *view = new QGraphicsView(scene_);
 	view->setMouseTracking(true);
     
-	//view->setRenderHint(QPainter::Antialiasing);
-
-
-
     solver_slots_.push_back(solver_slot_t("Original", order_solver));
     solver_slots_.push_back(solver_slot_t("Due dates", due_dates_solver));
     selected_solver_ = solver_slots_.size() - 1;
-
     solver_slots_.push_back(solver_slot_t("Random pair", boost::bind(random_solver, _1, _2, 10000)));
     solver_slots_.push_back(solver_slot_t("Best pair", all_pairs_solver));
     solver_slots_.push_back(solver_slot_t("Best triple", boost::bind(all_triples_solver, _1, _2, 7)));
@@ -112,23 +79,32 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
         sideLayout->addWidget(solver_slots_[i].lbl, i, 1);
 
     }
-
     connect(mapper, SIGNAL(mapped(int)), this, SLOT(runSolver(int)));
-
     
     sideLayout->addWidget(new QLabel("Cost:"), solver_slots_.size(), 0);
 
-    /*QPushButton *rescheduleBtn = new QPushButton("Reschedule");
-    sideLayout->addWidget(rescheduleBtn, solver_slots_.size() + 1, 0);
-    connect(rescheduleBtn, SIGNAL(clicked()), this, SLOT(reschedule()));*/
-
-    QPushButton *advanceBtn = new QPushButton("Advance");
+    /*QPushButton *advanceBtn = new QPushButton("Advance");
     sideLayout->addWidget(advanceBtn, solver_slots_.size() + 1, 0);
     connect(advanceBtn, SIGNAL(clicked()), this, SLOT(advanceSubtask()));
 
     QPushButton *resetBtn = new QPushButton("Reset");
     sideLayout->addWidget(resetBtn, solver_slots_.size() + 2, 0);
-    connect(resetBtn, SIGNAL(clicked()), this, SLOT(resetSubtask()));
+    connect(resetBtn, SIGNAL(clicked()), this, SLOT(resetSubtask()));*/
+
+    QPushButton *playBtn = new QPushButton("Play");
+    sideLayout->addWidget(playBtn, solver_slots_.size() + 1, 0);
+    connect(playBtn, SIGNAL(clicked()), this, SLOT(playDemo()));
+
+    QPushButton *pauseBtn = new QPushButton("Pause");
+    sideLayout->addWidget(pauseBtn, solver_slots_.size() + 1, 1);
+    connect(pauseBtn, SIGNAL(clicked()), this, SLOT(pauseDemo()));
+
+    QPushButton *resetBtn = new QPushButton("Reset");
+    sideLayout->addWidget(resetBtn, solver_slots_.size() + 2, 0);
+    connect(resetBtn, SIGNAL(clicked()), this, SLOT(resetDemo()));
+
+    play_timer_ = new QTimer(this);
+    connect(play_timer_, SIGNAL(timeout()), this, SLOT(playTick()));
     
     cost_display_ = new QLabel("AAA");
     sideLayout->addWidget(cost_display_, solver_slots_.size(), 1);
@@ -252,5 +228,49 @@ void SchedDemo::resetSubtask()
     subtask_end_ = std::min<size_t>(task_.size(), 50);
     runSolver(selected_solver_);
     updateCost();
+}
+
+void SchedDemo::updateSubtask()
+{
+    size_t pos = 0;
+    for (; pos < task_.size(); ++pos)
+        if (sched_[due_dates_perm_[pos]] > window_pos_)
+            break;
+    subtask_begin_ = pos;
+
+    for (; pos < task_.size(); ++pos)
+        if (task_[due_dates_perm_[pos]].due > window_pos_ + window_span_)
+            break;
+    subtask_end_ = pos;
+
+    qwt_demo_->setAxisScale(QwtPlot::xBottom, window_pos_ - 1, window_pos_ + window_span_ + 1);
+
+    runSolver(selected_solver_);
+    updateCost();
+}
+
+void SchedDemo::playDemo()
+{
+    play_timer_->start(100);
+}
+
+void SchedDemo::playTick()
+{
+    window_pos_ += 0.5;
+    
+    setWindowTitle(QString::number(window_pos_));
+    updateSubtask();
+}
+
+void SchedDemo::pauseDemo()
+{
+    play_timer_->stop();
+}
+
+void SchedDemo::resetDemo()
+{
+    window_pos_ = 0;
+    play_timer_->stop();
+    updateSubtask();
 }
 
