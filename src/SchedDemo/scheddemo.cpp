@@ -32,9 +32,13 @@ SchedDemo::SchedDemo(QWidget *parent, Qt::WFlags flags)
     const size_t num_planes = 100;
 
     task_ = planes_task_with_bounds(num_planes, 210, 20);
-    perm_.resize(num_planes);
-    std::generate(perm_.begin(), perm_.end(), perm_generator());
+    original_perm_.resize(num_planes);
+    std::generate(original_perm_.begin(), original_perm_.end(), perm_generator());
+
+    perm_ = original_perm_;
     sched_ = perm2sched(task_, perm_);
+    subtask_begin_ = 0;
+    subtask_end_ = std::min<size_t>(task_.size(), 50);
 
     subtask_begin_ = 0;
     subtask_end_ = 50;
@@ -242,6 +246,8 @@ void SchedDemo::advanceSubtask()
 
 void SchedDemo::resetSubtask()
 {
+    perm_ = original_perm_;
+    sched_ = perm2sched(task_, perm_);
     subtask_begin_ = 0;
     subtask_end_ = std::min<size_t>(task_.size(), 50);
     runSolver(selected_solver_);

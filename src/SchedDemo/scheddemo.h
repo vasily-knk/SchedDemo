@@ -42,6 +42,7 @@ private:
     task_t task_;
 	perm_t perm_;
 	sched_t sched_;
+    perm_t original_perm_;
 
     size_t subtask_begin_, subtask_end_;
     
