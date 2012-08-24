@@ -14,8 +14,7 @@ SchedItem::SchedItem(SchedScene *scene, size_t id)
 
 QRectF SchedItem::boundingRect() const
 {
-    size_t real_id = (*scene_->perm_)[id_];
-    const task_t& task = *(scene_->task_);
+    
     return QRectF(0, 0, width_, height_);
 }
 
@@ -33,6 +32,10 @@ void SchedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
     QRectF rect = boundingRect();
     painter->drawRect(rect);
+    
+    if (id_ >= scene_->perm_->size())
+        return;
+
     QString text = QString::number((*scene_->perm_)[id_]) ;//+ ": " + QString::number(rect.width()) + ", "+ QString::number(rect.height());
     painter->drawText(rect, text);
 

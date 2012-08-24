@@ -16,6 +16,8 @@ public:
     void updateOffset(size_t offset);
     void updateSubtask();
 
+    void deleteJob(size_t pos);
+
 protected slots:
     void runSolver(int i);
     void reschedule();
@@ -43,11 +45,17 @@ private:
         QLabel *lbl;
     };
 private:
-    
+    const task_t original_task_;
+    const perm_t original_perm_;
+
+    size_t jobs_removed_;
+
     task_t task_;
 	perm_t perm_;
 	sched_t sched_;
-    perm_t original_perm_, due_dates_perm_;
+    //perm_t original_perm_, due_dates_perm_;
+
+    task_t deleted_jobs_;
 
     moment_t window_pos_, window_span_;
 public:

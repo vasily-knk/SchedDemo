@@ -77,6 +77,9 @@ perm_t all_pairs_solver(const task_t &t, const perm_t &src)
 
 perm_t annealing_solver(const task_t &t, const perm_t &src)
 {
+    if (t.size() < 2)
+        return src;
+    
     typedef mt19937 gen;
     gen randgen(static_cast<unsigned int>(std::time(0)));
 
@@ -121,7 +124,6 @@ perm_t all_triples_solver(const task_t &t, const perm_t &src, size_t n_iters)
 {
     perm_t dst (src);
 
-
     for (size_t iter = 0; iter < n_iters; ++iter)
     {
         int counter = 0;
@@ -159,11 +161,9 @@ perm_t all_triples_solver(const task_t &t, const perm_t &src, size_t n_iters)
                     }
                     else
                         dst = orig;
-
                 }
             }
         }
-        //cout << " iter " << iter << ": " << counter << " swaps" << endl;
     }
     return dst;        
 }

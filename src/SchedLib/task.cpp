@@ -68,6 +68,26 @@ bool check_feasible(const task_t &task, const perm_t &perm)
 
 }
 
+size_t get_unfeasible_pos(const task_t &task, const perm_t &perm)
+{
+    assert(task.size() == perm.size());
+
+    moment_t last = -std::numeric_limits<moment_t>::max();
+
+    sched_t sched(task.size());
+    for (size_t pos = 0; pos < task.size(); ++pos)
+    {
+        const size_t job = perm[pos];
+
+        sched[job] = std::max(last, task[job].min_bound);
+        if (sched[job] > task[job].max_bound)
+            return pos;
+
+        last = sched[job] + get_processing_time(task, perm, pos);
+    }
+    return task.size();
+}
+
 task_t apply_permutation(const task_t &task, const perm_t &perm)
 {
     task_t temp(perm.size());

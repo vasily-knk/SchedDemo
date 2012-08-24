@@ -22,6 +22,7 @@ protected:
     void keyPressEvent(QKeyEvent *keyEvent);
 
 
+
 public:
     const task_t* getTask() const {return task_;}
     const sched_t* getSched() const {return sched_;}

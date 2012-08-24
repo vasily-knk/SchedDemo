@@ -78,6 +78,7 @@ cost_t get_cost_partial(const task_t &task, const sched_t &sched, const perm_t &
 
 cost_t calculate_cost(const task_t &task, const perm_t &perm);
 bool check_feasible(const task_t &task, const perm_t &perm);
+size_t get_unfeasible_pos(const task_t &task, const perm_t &perm);
 
 typedef boost::function<perm_t(const task_t &, const perm_t &)> solver_t;
 

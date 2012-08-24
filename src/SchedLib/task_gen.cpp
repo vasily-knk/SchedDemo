@@ -132,7 +132,7 @@ task_t planes_task_with_bounds(const size_t num_planes, const moment_t timespan,
     mt19937 randgen(static_cast<unsigned int>(std::time(0)));
     uniform_real_distribution<float> classes_distr(0, 1);
     uniform_real_distribution<moment_t> bounds_distr(bound_timespan * 0.7, bound_timespan);
-    uniform_real_distribution<moment_t> dates_distr(0, timespan);
+    uniform_real_distribution<moment_t> dates_distr(bound_timespan, timespan);
     uniform_real_distribution<cost_t> weights_distr(0.2, 1.0);
 
     task_t task(num_planes);
@@ -156,8 +156,8 @@ task_t planes_task_with_bounds(const size_t num_planes, const moment_t timespan,
     for (size_t i = 0; i < num_planes; ++i)
     {
         task[i].due = dates_distr(randgen);
-        //task[i].min_bound = std::max(task[i].due - bounds_distr(randgen), moment_t(0));
-        task[i].min_bound = task[i].due;
+        task[i].min_bound = std::max(task[i].due - bounds_distr(randgen), moment_t(0));
+        //task[i].min_bound = task[i].due;
         task[i].max_bound = task[i].due + bounds_distr(randgen);
         
         task[i].eweight = task[i].tweight = weights_distr(randgen);

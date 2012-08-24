@@ -43,23 +43,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scheddemo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_scheddemo.cpp">
       <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scheditem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="schedscene.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_schedscene.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -88,7 +73,22 @@
     <ClCompile Include="GeneratedFiles\Release\moc_qwtscheddemo.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="qwtscheddemo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scheddemo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scheditem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="schedscene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="solvers.cpp">
@@ -96,20 +96,26 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="scheddemo.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="scheddemo.qrc">
       <Filter>Resource Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="schedscene.h">
-      <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="qwtscheddemo.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="scheddemo.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="schedscene.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\common.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\task.h">
+      <Filter>common</Filter>
+    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -118,12 +124,6 @@
     </ClInclude>
     <ClInclude Include="sliding_window.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\common.h">
-      <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\task.h">
-      <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="solvers.h">
       <Filter>Header Files</Filter>

@@ -100,9 +100,12 @@ void SchedScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 void SchedScene::keyPressEvent(QKeyEvent *keyEvent)
 {
-    if (keyEvent->key() == Qt::Key_Space)
+    if (keyEvent->key() == Qt::Key_Delete)
     {
-        invalidateItems();
+
+        QMessageBox box;
+        box.setText("Delete");
+        box.exec();
     }
 }
 
@@ -214,7 +217,7 @@ qreal SchedScene::getItemWidth(size_t i) const
 
 void SchedScene::updateItems()
 {
-	for (size_t i = 0; i < jobs_.size(); ++i)
+	for (size_t i = 0; i < task_->size(); ++i)
 	{
 		const size_t index = (*perm_)[i];
         jobs_[i]->setPos(time2coord((*sched_)[index]), JOBS_HEIGHT);
@@ -273,12 +276,12 @@ void SchedScene::invalidateItems()
         }
     }*/
 
-    for (size_t i = 0; i < jobs_.size(); ++i)
+    for (size_t i = 0; i < task_->size(); ++i)
     {
         const size_t job_i = (*perm_)[i];
         qreal width = 5; // FIXME
 
-        if (i < jobs_.size() - 1)
+        if (i < task_->size() - 1)
         {
             const size_t next_job = (*perm_)[i + 1];
             width = time2coord((*task_)[job_i].spans[next_job]);
@@ -288,17 +291,17 @@ void SchedScene::invalidateItems()
         jobs_[i]->setColor(Qt::cyan);
     }
 
+    for (size_t i = task_->size(); i < jobs_.size(); ++i)
+        jobs_[i]->setColor(Qt::red);
 
-    
     for (size_t i = subtask_begin_; i < subtask_end_; ++i)
     {
-        jobs_[i]->setColor(Qt::blue);
+        jobs_[i]->setColor(Qt::blue);           
         jobs_[i]->setColor(Qt::blue);
     }
 
     if (current.is_initialized())
         jobs_[*current]->setColor(QColor(255, 0, 0));
-
 
 
     updateItems();
