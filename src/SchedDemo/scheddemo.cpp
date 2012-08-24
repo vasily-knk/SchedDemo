@@ -2,24 +2,12 @@
 #include "scheddemo.h"
 #include "schedscene.h"
 #include "qwtscheddemo.h"
+#include "solvers.h"
 
 #include "sliding_window.h"
 
 void planes_task(float timespan, task_t &t);
 task_t planes_task_with_bounds(const size_t num_planes, const moment_t timespan, const moment_t bound_timespan);
-
-perm_t order_solver(const task_t &t, const perm_t &src);
-perm_t due_dates_solver(const task_t &t, const perm_t &src);
-perm_t random_solver(const task_t &t, const perm_t &src, size_t n_iters);
-perm_t all_pairs_solver(const task_t &t, const perm_t &src);
-perm_t annealing_solver(const task_t &t, const perm_t &src);
-perm_t all_triples_solver(const task_t &t, const perm_t &src, size_t n_iters);
-
-sched_t perm2sched(const task_t &task, const perm_t &perm);
-
-task_t gen_task1();
-task_t gen_task2();
-task_t gen_task3();
 
 SchedDemo::SchedDemo(const size_t num_planes, const moment_t timespan, const moment_t bounds, const moment_t window_span, QWidget *parent/* = 0*/, Qt::WFlags flags/* = 0*/)
 	: QWidget(parent, flags)
@@ -239,18 +227,26 @@ void SchedDemo::updateSubtask()
     for (; pos < task_.size(); ++pos)
         if (sched_[due_dates_perm_[pos]] > window_pos_)
             break;
-    subtask_begin_ = pos;
+    const size_t begin = pos;
 
     for (; pos < task_.size(); ++pos)
         if (task_[due_dates_perm_[pos]].due > window_pos_ + window_span_)
             break;
-    subtask_end_ = pos;
+    const size_t end = pos;
+
 
     qwt_demo_->setAxisScale(QwtPlot::xBottom, window_pos_ - 1, window_pos_ + window_span_ + 10);
-    scene_->setSubTask(subtask_begin_, subtask_end_);
+    qwt_demo_->replot();
 
-    runSolver(selected_solver_);
-    updateCost();
+    if (begin != subtask_begin_ || end != subtask_end_)
+    {
+        subtask_begin_ = begin;
+        subtask_end_ = end;
+
+        scene_->setSubTask(subtask_begin_, subtask_end_);
+        runSolver(selected_solver_);
+        updateCost();
+    }
 }
 
 void SchedDemo::playDemo()

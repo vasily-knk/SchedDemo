@@ -91,6 +91,9 @@
     <ClCompile Include="qwtscheddemo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="solvers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="scheddemo.h">
@@ -121,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="..\common\task.h">
       <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="solvers.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -156,7 +156,8 @@ task_t planes_task_with_bounds(const size_t num_planes, const moment_t timespan,
     for (size_t i = 0; i < num_planes; ++i)
     {
         task[i].due = dates_distr(randgen);
-        task[i].min_bound = std::max(task[i].due - bounds_distr(randgen), moment_t(0));
+        //task[i].min_bound = std::max(task[i].due - bounds_distr(randgen), moment_t(0));
+        task[i].min_bound = task[i].due;
         task[i].max_bound = task[i].due + bounds_distr(randgen);
         
         task[i].eweight = task[i].tweight = weights_distr(randgen);
