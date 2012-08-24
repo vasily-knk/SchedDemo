@@ -50,9 +50,12 @@ private:
     perm_t original_perm_, due_dates_perm_;
 
     moment_t window_pos_, window_span_;
+public:
     size_t subtask_begin_, subtask_end_;
+private:
 
     QTimer *play_timer_;
+    QScrollBar *speedBar_;
     
     cost_t cost_;
 

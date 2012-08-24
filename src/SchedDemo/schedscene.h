@@ -67,6 +67,12 @@ public:
     { 
         timeScale_ = val; 
     }
+
+    void setSubTask(const size_t begin, const size_t end)
+    {
+        subtask_begin_ = begin;
+        subtask_end_ = end;
+    }
 private:
     void updateCost();
 
@@ -102,6 +108,8 @@ private:
     const qreal DATES_HEIGHT, JOBS_HEIGHT;
 
 	cost_clb_t cost_clb_;
+
+    size_t subtask_begin_, subtask_end_;
 
 public:
     boost::optional<size_t> current;

@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
 
-	SchedDemo demo(100, 100, 100, 50);
+	SchedDemo demo(150, 300, 20, 100);
 	demo.show();
 	
 

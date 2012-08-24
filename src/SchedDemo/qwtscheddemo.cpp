@@ -105,36 +105,37 @@ void QwtSchedDemo::updateData(const task_t &task, const perm_t &perm, const sche
     assert(subtask_end_ >= subtask_begin_);
     assert(subtask_end_ <= perm.size());
 
-    const size_t n = subtask_end_;
+    const size_t n = subtask_end_ - subtask_begin_;
 
     QVector<QwtIntervalSample> samples_min_bounds(n);
     QVector<QwtIntervalSample> samples_max_bounds(n);
     QVector<QwtIntervalSample> samples_planes(n);
-    QVector<QwtIntervalSample> samples_planes_subtask(subtask_end_ - subtask_begin_);
+    //QVector<QwtIntervalSample> samples_planes_subtask(subtask_end_ - subtask_begin_);
     
-    for (size_t pos = 0; pos < n; ++pos)
+    for (size_t pos = subtask_begin_; pos < subtask_end_; ++pos)
     {
         const size_t job = perm[pos];
+        const size_t index = pos - subtask_begin_;
 
         QwtInterval interval(sched[job], sched[job] + get_processing_time(task, perm, pos));
         interval.setBorderFlags(QwtInterval::ExcludeMaximum);
 
-        samples_min_bounds[pos] = QwtIntervalSample(task[job].min_bound - task[job].due, interval);
-        samples_max_bounds[pos] = QwtIntervalSample(task[job].max_bound - task[job].due, interval);
-        samples_planes    [pos] = QwtIntervalSample(sched[job]          - task[job].due, interval);
+        samples_min_bounds[index] = QwtIntervalSample(task[job].min_bound - task[job].due, interval);
+        samples_max_bounds[index] = QwtIntervalSample(task[job].max_bound - task[job].due, interval);
+        samples_planes    [index] = QwtIntervalSample(sched[job]          - task[job].due, interval);
         //samples_planes_subtask[pos - subtask_begin_] = QwtIntervalSample();
 
-        if (pos >= subtask_begin_ && pos < subtask_end_)
+        /*if (pos >= subtask_begin_ && pos < subtask_end_)
         {
             samples_planes_subtask[pos - subtask_begin_] = QwtIntervalSample();
             std::swap(samples_planes[pos], samples_planes_subtask[pos - subtask_begin_]);
-        }
+        }*/
     }
 
     hist_min_bounds_->setData(new QwtIntervalSeriesData(samples_min_bounds));
     hist_max_bounds_->setData(new QwtIntervalSeriesData(samples_max_bounds));
     hist_planes_    ->setData(new QwtIntervalSeriesData(samples_planes));
-    hist_planes_subtask_->setData(new QwtIntervalSeriesData(samples_planes_subtask));
+    //hist_planes_subtask_->setData(new QwtIntervalSeriesData(samples_planes_subtask));
     
     replot();
 }

@@ -25,6 +25,7 @@ using boost::random::uniform_int_distribution;
 
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
+#include <boost/foreach.hpp>
 
 #include <cmath>
 

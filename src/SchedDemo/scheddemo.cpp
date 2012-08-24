@@ -69,12 +69,12 @@ SchedDemo::SchedDemo(const size_t num_planes, const moment_t timespan, const mom
 
     for (size_t i = 0; i < solver_slots_.size(); ++i)
     {
-        solver_slots_[i].btn = new QPushButton(solver_slots_[i].name);
+        solver_slots_[i].btn = new QPushButton(solver_slots_[i].name, this);
 
         mapper->setMapping(solver_slots_[i].btn, i);
         connect(solver_slots_[i].btn, SIGNAL(clicked()), mapper, SLOT(map()));
 
-        solver_slots_[i].lbl = new QLabel;
+        solver_slots_[i].lbl = new QLabel(this);
         sideLayout->addWidget(solver_slots_[i].btn, i, 0);
         sideLayout->addWidget(solver_slots_[i].lbl, i, 1);
 
@@ -91,22 +91,25 @@ SchedDemo::SchedDemo(const size_t num_planes, const moment_t timespan, const mom
     sideLayout->addWidget(resetBtn, solver_slots_.size() + 2, 0);
     connect(resetBtn, SIGNAL(clicked()), this, SLOT(resetSubtask()));*/
 
-    QPushButton *playBtn = new QPushButton("Play");
+    QPushButton *playBtn = new QPushButton("Play", this);
     sideLayout->addWidget(playBtn, solver_slots_.size() + 1, 0);
     connect(playBtn, SIGNAL(clicked()), this, SLOT(playDemo()));
 
-    QPushButton *pauseBtn = new QPushButton("Pause");
+    QPushButton *pauseBtn = new QPushButton("Pause", this);
     sideLayout->addWidget(pauseBtn, solver_slots_.size() + 1, 1);
     connect(pauseBtn, SIGNAL(clicked()), this, SLOT(pauseDemo()));
 
-    QPushButton *resetBtn = new QPushButton("Reset");
+    QPushButton *resetBtn = new QPushButton("Reset", this);
     sideLayout->addWidget(resetBtn, solver_slots_.size() + 2, 0);
     connect(resetBtn, SIGNAL(clicked()), this, SLOT(resetDemo()));
+
+    speedBar_ = new QScrollBar(Qt::Horizontal, this);
+    sideLayout->addWidget(speedBar_, solver_slots_.size() + 3, 0, 1, 2);
 
     play_timer_ = new QTimer(this);
     connect(play_timer_, SIGNAL(timeout()), this, SLOT(playTick()));
     
-    cost_display_ = new QLabel("AAA");
+    cost_display_ = new QLabel("AAA", this);
     sideLayout->addWidget(cost_display_, solver_slots_.size(), 1);
     sidePanel->setLayout(sideLayout);
 
@@ -243,7 +246,8 @@ void SchedDemo::updateSubtask()
             break;
     subtask_end_ = pos;
 
-    qwt_demo_->setAxisScale(QwtPlot::xBottom, window_pos_ - 1, window_pos_ + window_span_ + 1);
+    qwt_demo_->setAxisScale(QwtPlot::xBottom, window_pos_ - 1, window_pos_ + window_span_ + 10);
+    scene_->setSubTask(subtask_begin_, subtask_end_);
 
     runSolver(selected_solver_);
     updateCost();
@@ -256,7 +260,9 @@ void SchedDemo::playDemo()
 
 void SchedDemo::playTick()
 {
-    window_pos_ += 0.5;
+    moment_t speed = (static_cast<moment_t>(speedBar_->value()) - static_cast<moment_t>(speedBar_->minimum())) / (static_cast<moment_t>(speedBar_->maximum()) - static_cast<moment_t>(speedBar_->minimum()));
+    speed *= 2;
+    window_pos_ += speed;
     
     setWindowTitle(QString::number(window_pos_));
     updateSubtask();
@@ -271,6 +277,7 @@ void SchedDemo::resetDemo()
 {
     window_pos_ = 0;
     play_timer_->stop();
+    perm_ = due_dates_perm_;
     updateSubtask();
 }
 

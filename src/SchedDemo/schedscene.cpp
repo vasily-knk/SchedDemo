@@ -50,6 +50,9 @@ SchedScene::SchedScene(task_t *task, perm_t *perm, sched_t *sched, QObject *pare
 	, DATES_HEIGHT(0)
 	, JOBS_HEIGHT (100)
 
+    , subtask_begin_(0)
+    , subtask_end_(0)
+
 {
 
     //marker->setPos(0, 0);
@@ -237,8 +240,7 @@ void SchedScene::updateCost()
 
 void SchedScene::invalidateItems()
 {
-    vector<cost_t> tards(jobs_.size());
-
+    /*vector<cost_t> tards(jobs_.size());
 
     for (size_t i = 0; i < jobs_.size(); ++i)
     {
@@ -269,6 +271,29 @@ void SchedScene::invalidateItems()
             int red = std::min(static_cast<int>(255.0 * 2.0 * ratio), 255);
             jobs_[i]->setColor(QColor(red, green, 0));
         }
+    }*/
+
+    for (size_t i = 0; i < jobs_.size(); ++i)
+    {
+        const size_t job_i = (*perm_)[i];
+        qreal width = 5; // FIXME
+
+        if (i < jobs_.size() - 1)
+        {
+            const size_t next_job = (*perm_)[i + 1];
+            width = time2coord((*task_)[job_i].spans[next_job]);
+        }
+
+        jobs_[i]->updateData(width, weight2coord((*task_)[job_i].tweight));
+        jobs_[i]->setColor(Qt::cyan);
+    }
+
+
+    
+    for (size_t i = subtask_begin_; i < subtask_end_; ++i)
+    {
+        jobs_[i]->setColor(Qt::blue);
+        jobs_[i]->setColor(Qt::blue);
     }
 
     if (current.is_initialized())
