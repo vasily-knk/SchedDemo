@@ -14,7 +14,6 @@ SchedItem::SchedItem(SchedScene *scene, size_t id)
 
 QRectF SchedItem::boundingRect() const
 {
-    
     return QRectF(0, 0, width_, height_);
 }
 

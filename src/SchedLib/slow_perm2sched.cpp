@@ -76,7 +76,7 @@ namespace {
     void slow_perm2sched_context::add_last_job()
     {
         const size_t job = perm.back();
-        jobs_list.insert(jobs_list_t::value_type(moment_t(0), task[job].tweight));
+        jobs_list.insert(jobs_list_t::value_type(moment_t(0), task[job].tweight()));
         sched[job] = task[job].due;
         max_push = task[job].max_bound - sched[job];
     }
@@ -101,7 +101,7 @@ namespace {
         const size_t job = perm[pos];
 
         move_jobs_list(sched[job] - task[job].due);
-        jobs_list.insert(jobs_list_t::value_type(moment_t(0), task[job].tweight));
+        jobs_list.insert(jobs_list_t::value_type(moment_t(0), task[job].tweight()));
         sched[job] = task[job].due;
     }
 
@@ -112,9 +112,9 @@ namespace {
         const moment_t original_time = sched[job];
         moment_t final_time = original_time;
 
-        jobs_list.insert(jobs_list_t::value_type(task[job].due - original_time, task[job].eweight + task[job].tweight));
+        jobs_list.insert(jobs_list_t::value_type(task[job].due - original_time, task[job].eweight() + task[job].tweight()));
 
-        cost_t gathered_penalty = -task[job].eweight;
+        cost_t gathered_penalty = -task[job].eweight();
         jobs_list_t::iterator it;
         for (it = jobs_list.begin(); it != jobs_list.end(); ++it)
         {

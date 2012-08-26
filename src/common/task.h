@@ -3,13 +3,16 @@
 typedef float moment_t;
 typedef float cost_t;
 
-struct job_t
+/*struct job_t
 {
     moment_t due;
     vector<moment_t> spans;
     cost_t eweight, tweight;
     moment_t min_bound, max_bound;
-};
+};*/
+
+#include "aircraft.h"
+typedef aircraft_t job_t;
 
 
 struct perm_t : vector<size_t> 
@@ -46,6 +49,9 @@ private:
 };
 
 
+typedef vector<job_t> task_t;
+
+/*
 struct task_t : vector<job_t>
 {
     task_t()
@@ -59,15 +65,16 @@ struct task_t : vector<job_t>
 			it->spans.resize(n);
 	}
 };
+*/
 
 typedef vector<moment_t> sched_t;
 
 inline moment_t get_processing_time(const task_t &task, const perm_t &perm, const size_t pos)
 {
     if (pos == perm.size() - 1)
-        return task[perm[pos]].spans.front();
+        return task[perm[pos]].span(task[perm[pos]]);
 
-    return task[perm[pos]].spans[perm[pos + 1]];
+    return task[perm[pos]].span(task[perm[pos + 1]]);
 }
 
 sched_t slow_and_broken_perm2sched(const task_t &task, const perm_t &perm);

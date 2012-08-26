@@ -170,7 +170,7 @@ void SchedScene::showTRect(size_t item)
 
     if (tardiness > 0)
     {
-        tRect_->setRect(time2coord((*task_)[job].due), JOBS_HEIGHT, time2coord(tardiness), /*JOBS_HEIGHT + */weight2coord((*task_)[job].tweight));
+        tRect_->setRect(time2coord((*task_)[job].due), JOBS_HEIGHT, time2coord(tardiness), /*JOBS_HEIGHT + */weight2coord((*task_)[job].tweight()));
         tRect_->setVisible(true);
     }
     else
@@ -279,15 +279,9 @@ void SchedScene::invalidateItems()
     for (size_t i = 0; i < task_->size(); ++i)
     {
         const size_t job_i = (*perm_)[i];
-        qreal width = 5; // FIXME
+        qreal width = time2coord(get_processing_time(*task_, *perm_, i));
 
-        if (i < task_->size() - 1)
-        {
-            const size_t next_job = (*perm_)[i + 1];
-            width = time2coord((*task_)[job_i].spans[next_job]);
-        }
-
-        jobs_[i]->updateData(width, weight2coord((*task_)[job_i].tweight));
+        jobs_[i]->updateData(width, weight2coord((*task_)[job_i].tweight()));
         jobs_[i]->setColor(Qt::cyan);
     }
 

@@ -80,7 +80,7 @@ namespace {
     void perm2sched_context::add_last_job()
     {
         const size_t job = perm.back();
-        insert_job(moment_t(0), task[job].tweight);
+        insert_job(moment_t(0), task[job].tweight());
         sched[job] = task[job].due;
         max_push = task[job].max_bound - sched[job];
     }
@@ -105,7 +105,7 @@ namespace {
         const size_t job = perm[pos];
 
         move_jobs_list(sched[job] - task[job].due);
-        insert_job(moment_t(0), task[job].tweight);
+        insert_job(moment_t(0), task[job].tweight());
         sched[job] = task[job].due;
     }
 
@@ -116,9 +116,9 @@ namespace {
         const moment_t original_time = sched[job];
         moment_t final_time = original_time;
 
-        insert_job(task[job].due - original_time, task[job].eweight + task[job].tweight);
+        insert_job(task[job].due - original_time, task[job].eweight() + task[job].tweight());
 
-        cost_t gathered_penalty = -task[job].eweight;
+        cost_t gathered_penalty = -task[job].eweight();
         jobs_list_t::iterator it;
         for (it = jobs_list.begin(); it != jobs_list.end(); ++it)
         {

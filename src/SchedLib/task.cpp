@@ -12,9 +12,9 @@ cost_t get_cost(const task_t &task, const sched_t &sched)
 
         const moment_t deviation = std::abs(sched[i] - task[i].due);
         if (sched[i] - task[i].due > 0)
-            cost += task[i].tweight * deviation;
+            cost += task[i].tweight() * deviation;
         else
-            cost += task[i].eweight * deviation;
+            cost += task[i].eweight() * deviation;
     }
     return cost;
 }
@@ -32,9 +32,9 @@ cost_t get_cost_partial(const task_t &task, const sched_t &sched, const perm_t &
 
         const moment_t deviation = std::abs(sched[job] - task[job].due);
         if (sched[job] - task[job].due > 0)
-            cost += task[job].tweight * deviation;
+            cost += task[job].tweight() * deviation;
         else
-            cost += task[job].eweight * deviation;
+            cost += task[job].eweight() * deviation;
     }
     return cost;
 }
@@ -94,9 +94,9 @@ task_t apply_permutation(const task_t &task, const perm_t &perm)
     for (size_t i = 0; i < perm.size(); ++i)
     {
         temp[i] = task[perm[i]];
-        temp[i].spans.resize(perm.size());
+        /*temp[i].spans.resize(perm.size());
         for (size_t j = 0; j < perm.size(); ++j)
-            temp[i].spans[j] = task[perm[i]].spans[perm[j]];
+            temp[i].spans[j] = task[perm[i]].spans[perm[j]];*/
     }
     return temp;
 }
