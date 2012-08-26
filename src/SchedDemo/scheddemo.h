@@ -18,15 +18,17 @@ public:
 
     void deleteJob(size_t pos);
 
+    void updateTime();
+
 protected slots:
     void runSolver(int i);
-    void reschedule();
+    /*void reschedule();
     void advanceSubtask();
     void resetSubtask();
     void playDemo();
     void pauseDemo();
     void resetDemo();
-    void playTick();
+    void playTick();*/
 private:
     struct solver_slot_t
     {
@@ -58,8 +60,6 @@ private:
     task_t deleted_jobs_;
 
     moment_t window_pos_, window_span_;
-public:
-    size_t subtask_begin_, subtask_end_;
 private:
 
     QTimer *play_timer_;
@@ -74,7 +74,6 @@ private:
 
     QwtSchedDemo *qwt_demo_;
 
-    size_t reschedule_index_;
 
 };
 

@@ -3,6 +3,7 @@
 #include "schedscene.h"
 #include "qwtscheddemo.h"
 #include "solvers.h"
+#include "qwt_demo_2.h"
 
 #include "sliding_window.h"
 
@@ -18,8 +19,6 @@ SchedDemo::SchedDemo(const size_t num_planes, const moment_t timespan, const mom
     , original_perm_(num_planes)
     , window_pos_(-50)
     , window_span_(window_span)
-    , subtask_begin_(0)
-    , subtask_end_(0)
 {
     task_ = original_task_;
     perm_ = original_perm_;
@@ -79,7 +78,7 @@ SchedDemo::SchedDemo(const size_t num_planes, const moment_t timespan, const mom
     sideLayout->addWidget(resetBtn, solver_slots_.size() + 2, 0);
     connect(resetBtn, SIGNAL(clicked()), this, SLOT(resetSubtask()));*/
 
-    QPushButton *playBtn = new QPushButton("Play", this);
+    /*QPushButton *playBtn = new QPushButton("Play", this);
     sideLayout->addWidget(playBtn, solver_slots_.size() + 1, 0);
     connect(playBtn, SIGNAL(clicked()), this, SLOT(playDemo()));
 
@@ -95,7 +94,7 @@ SchedDemo::SchedDemo(const size_t num_planes, const moment_t timespan, const mom
     sideLayout->addWidget(speedBar_, solver_slots_.size() + 3, 0, 1, 2);
 
     play_timer_ = new QTimer(this);
-    connect(play_timer_, SIGNAL(timeout()), this, SLOT(playTick()));
+    connect(play_timer_, SIGNAL(timeout()), this, SLOT(playTick()));*/
     
     cost_display_ = new QLabel("AAA", this);
     sideLayout->addWidget(cost_display_, solver_slots_.size(), 1);
@@ -111,6 +110,9 @@ SchedDemo::SchedDemo(const size_t num_planes, const moment_t timespan, const mom
 	setLayout(layout);
     scene_->invalidateItems();
     updateCost();
+
+    qwt_demo_2 *demo2 = new qwt_demo_2(NULL);
+    demo2->show();
 }
 
 SchedDemo::~SchedDemo()
@@ -120,18 +122,15 @@ SchedDemo::~SchedDemo()
 
 void SchedDemo::updateCost()
 {
-    //sched_ = perm2sched(task_, perm_);
-
-    reschedule_index_ = task_.size() - 1;
     scene_->current.reset();
 
-	const cost_t cost = get_cost_partial(task_, sched_, perm_, 0, subtask_end_);
+	const cost_t cost = get_cost(task_, sched_);
     cost_display_->setText(QString::number(cost));
 
-    qwt_demo_->updateData(task_, perm_, sched_, subtask_begin_, subtask_end_);
+    qwt_demo_->updateData(task_, perm_, sched_, 0, task_.size());
 }
 
-perm_t shrink_perm(const task_t &task, const perm_t &perm, const size_t removed_item)
+perm_t shrink_perm(const task_t &/*task*/, const perm_t &perm, const size_t removed_item)
 {
     perm_t dst;
     for (auto it = perm.begin(); it != perm.end(); ++it)
@@ -145,6 +144,20 @@ perm_t shrink_perm(const task_t &task, const perm_t &perm, const size_t removed_
 }
 
 void SchedDemo::runSolver(const int solver_index)
+{
+    if (solver_slots_[solver_index].solver == NULL)
+        return;
+
+    perm_ = solver_slots_[solver_index].solver(task_, perm_);
+    sched_ = perm2sched(task_, perm_);
+    
+    updateCost();
+    const cost_t cost = get_cost(task_, sched_);
+    solver_slots_[solver_index].lbl->setText(QString::number(cost));
+    scene_->invalidateItems();
+
+}
+/*void SchedDemo::runSolver(const int solver_index)
 {
     if (solver_slots_[solver_index].solver == NULL)
         return;
@@ -215,33 +228,24 @@ void SchedDemo::runSolver(const int solver_index)
     const cost_t cost = get_cost_partial(task_, sched_, perm_, 0, subtask_end_);
     solver_slots_[solver_index].lbl->setText(QString::number(cost));
     scene_->invalidateItems();
-}
+}*/
 
 void SchedDemo::updateOffset(size_t offset)
 {
     const QString str = QString("Offset: ") + QString::number(offset);
 }
 
-void SchedDemo::reschedule()
+void SchedDemo::updateTime()
 {
+    assert (task_.size() == sched_.size());
+    assert (task_.size() == perm_.size());
 
-    /*add_job(task_, perm_, reschedule_index_, sched_);
-    for (int pos = reschedule_index_ - 1; pos >= 0; --pos)
-        sched_[perm_[pos]] = sched_[perm_[pos + 1]] - get_processing_time(task_, perm_, pos) - 1.0;
+    task_t temp_task;
+    perm_t temp_perm;
 
-    
-    scene_->current.reset(reschedule_index_);
-
-    if (reschedule_index_ == 0)
-        reschedule_index_ = task_.size() - 1;
-    else
-        --reschedule_index_;
-
-    scene_->invalidateItems();*/
-    
 }
 
-void SchedDemo::advanceSubtask()
+/*void SchedDemo::advanceSubtask()
 {
     subtask_begin_ = std::min(task_.size(), subtask_begin_ + 1);
     subtask_end_ = std::min(task_.size(), subtask_end_ + 1);
@@ -325,5 +329,5 @@ void SchedDemo::resetDemo()
 void SchedDemo::deleteJob(const size_t pos)
 {
 
-}
+}    */
 

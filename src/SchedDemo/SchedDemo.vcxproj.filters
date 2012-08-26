@@ -94,6 +94,21 @@
     <ClCompile Include="solvers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="qwt_demo_2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_qwt_demo_2.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Profiling\moc_qwt_demo_2.cpp">
+      <Filter>Generated Files\Profiling</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_qwt_demo_2.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="qwt_aircraft.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="scheddemo.qrc">
@@ -106,6 +121,9 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="schedscene.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="qwt_demo_2.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -126,6 +144,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="solvers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="qwt_aircraft.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
