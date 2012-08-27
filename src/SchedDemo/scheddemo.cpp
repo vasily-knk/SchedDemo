@@ -15,15 +15,19 @@ SchedDemo::SchedDemo(const size_t num_planes, const moment_t timespan, const mom
     , jobs_removed_(0)
     , original_task_(planes_task_with_bounds(num_planes, timespan, bounds))
     //, original_perm_(num_planes)
-    , window_pos_(0)
+    , window_pos_(-2)
     , window_span_(window_span)
     , next_job_(0)
+    , total_cost(0)
 {
-    //task_ = original_task_;
-    //perm_ = original_perm_;
-    sched_ = perm2sched(original_task_, perm_);
+    resetDemo();
+    BOOST_FOREACH(job_t& job, fake_task_)
+    {
+        job.min_bound = job.due;
+    }
+    sched_ = perm2sched(task_, perm_);
 
-	//scene_ = new SchedScene(&task_, &perm_, &sched_);
+
 	
 	auto clb = boost::bind(&SchedDemo::updateCost, this);
 	//scene_->setCostCallback(clb);
@@ -65,9 +69,8 @@ SchedDemo::SchedDemo(const size_t num_planes, const moment_t timespan, const mom
         sideLayout->addWidget(solver_slots_[i].lbl, i, 1);
 
     }
-    connect(mapper, SIGNAL(mapped(int)), this, SLOT(runSolver(int)));
+    connect(mapper, SIGNAL(mapped(int)), this, SLOT(setSolver(int)));
     
-    sideLayout->addWidget(new QLabel("Cost:"), solver_slots_.size(), 0);
 
     QPushButton *advanceBtn = new QPushButton("Advance");
     sideLayout->addWidget(advanceBtn, solver_slots_.size() + 1, 0);
@@ -91,30 +94,50 @@ SchedDemo::SchedDemo(const size_t num_planes, const moment_t timespan, const mom
     play_timer_ = new QTimer(this);
     connect(play_timer_, SIGNAL(timeout()), this, SLOT(playTick()));
 
-    /*QPushButton *resetBtn = new QPushButton("Reset", this);
+    QPushButton *resetBtn = new QPushButton("Reset", this);
     sideLayout->addWidget(resetBtn, solver_slots_.size() + 2, 0);
     connect(resetBtn, SIGNAL(clicked()), this, SLOT(resetDemo()));
 
+    size_t pos_offset = solver_slots_.size() + 5;
+    sideLayout->addWidget(new QLabel("Cost:"), pos_offset, 0);
+    cost_display_ = new QLabel(this);
+    sideLayout->addWidget(cost_display_, pos_offset, 1);
+    ++pos_offset;
 
-    */
-    
-    cost_display_ = new QLabel("AAA", this);
-    sideLayout->addWidget(cost_display_, solver_slots_.size(), 1);
+    sideLayout->addWidget(new QLabel("Aircrafts Processed:"), pos_offset, 0);
+    processed_display_ = new QLabel(this);
+    sideLayout->addWidget(processed_display_, pos_offset, 1);
+    ++pos_offset;
+
+    sideLayout->addWidget(new QLabel("Aircrafts Removed:"), pos_offset, 0);
+    removed_display_ = new QLabel(this);
+    sideLayout->addWidget(removed_display_, pos_offset, 1);
+    ++pos_offset;
+
+    sideLayout->addWidget(new QLabel("Aircrafts in progress:"), pos_offset, 0);
+    in_progress_display_ = new QLabel(this);
+    sideLayout->addWidget(in_progress_display_, pos_offset, 1);
+    ++pos_offset;
+
     sidePanel->setLayout(sideLayout);
 
     //layout->addWidget(view, 0, 0);
 
+/*
     qwt_demo_ = new QwtSchedDemo(this);
     layout->addWidget(qwt_demo_, 1, 0);
+*/
 
     layout->addWidget(sidePanel, 0, 1, 2, 1);
+
+    demo2 = new qwt_demo_2(NULL);
+    demo2->setAxisScale(QwtPlot::xBottom, -30, 30);
+    layout->addWidget(demo2, 1, 0);
 
 	setLayout(layout);
     //scene_->invalidateItems();
     updateCost();
 
-    qwt_demo_2 *demo2 = new qwt_demo_2(NULL);
-    demo2->show();
 }
 
 SchedDemo::~SchedDemo()
@@ -124,13 +147,17 @@ SchedDemo::~SchedDemo()
 
 void SchedDemo::updateCost()
 {
-	const cost_t cost = get_cost(original_task_, sched_);
-    cost_display_->setText(QString::number(cost));
+	const cost_t cost = get_cost(task_, sched_);
+    cost_display_->setText(QString::number(total_cost));
+    processed_display_->setText(QString::number(jobs_processed_));
+    removed_display_->setText(QString::number(jobs_removed_));
+    in_progress_display_->setText(QString::number(perm_.size()));
 
-    qwt_demo_->updateData(original_task_, perm_, sched_, 0, original_task_.size());
+    demo2->updateData(task_, perm_, sched_);
 }
 
-perm_t shrink_perm(const task_t &/*task*/, const perm_t &perm, const size_t removed_item)
+/*
+perm_t shrink_perm(const task_t &, const perm_t &perm, const size_t removed_item)
 {
     perm_t dst;
     for (auto it = perm.begin(); it != perm.end(); ++it)
@@ -141,94 +168,49 @@ perm_t shrink_perm(const task_t &/*task*/, const perm_t &perm, const size_t remo
             dst.push_back(*it - 1);
     }
     return dst;
-}
+}*/
 
-void SchedDemo::runSolver(const int solver_index)
+
+void SchedDemo::runSolver()
 {
-    if (solver_slots_[solver_index].solver == NULL)
+    BOOST_FOREACH(size_t job, perm_)
+    {
+        task_[job] = original_task_[job];
+        if (selected_solver_ == 0)
+            task_[job].min_bound = task_[job].due;
+        else
+        {
+            
+        }
+        task_[job].min_bound = std::max(task_[job].min_bound, total_min_bound_);
+    }
+    
+    if (solver_slots_[selected_solver_].solver == NULL)
         return;
 
-    perm_ = solver_slots_[solver_index].solver(original_task_, perm_);
-    sched_ = perm2sched(original_task_, perm_);
+    perm_ = solver_slots_[selected_solver_].solver(task_, perm_);
+    size_t job_to_remove;
+/*
+    while ((job_to_remove = get_unfeasible_pos(task_, perm_)) != perm_.size())
+    {
+        perm_.erase(perm_.begin() + job_to_remove);
+        ++jobs_removed_;
+        perm_ = solver_slots_[selected_solver_].solver(task_, perm_);
+    }
+*/
+    sched_ = perm2sched(task_, perm_);
     
     updateCost();
-    const cost_t cost = get_cost(original_task_, sched_);
-    solver_slots_[solver_index].lbl->setText(QString::number(cost));
-    //scene_->invalidateItems();
-
+    const cost_t cost = get_cost(task_, sched_);
+    solver_slots_[selected_solver_].lbl->setText(QString::number(cost));
 }
-/*void SchedDemo::runSolver(const int solver_index)
-{
-    if (solver_slots_[solver_index].solver == NULL)
-        return;
 
+void SchedDemo::setSolver(const int solver_index)
+{
     selected_solver_ = solver_index;
 
-    perm_t mappings(subtask_end_ - subtask_begin_);
-    
-    if (mappings.empty())
-        return;
+}
 
-    std::copy(perm_.begin() + subtask_begin_, perm_.begin() + subtask_end_, mappings.begin());
-
-    task_t subtask = apply_permutation(task_, mappings);
-
-    if (subtask_begin_ > 0)
-    {
-        const moment_t total_min_bound = sched_[perm_[subtask_begin_ - 1]] + get_processing_time(task_, perm_, subtask_begin_ - 1);
-        for (task_t::iterator it = subtask.begin(); it != subtask.end(); ++it)
-        {
-            it->min_bound = std::max(it->min_bound, total_min_bound);
-            it->due = std::max(it->due, it->min_bound);
-        }
-    }
-
-    perm_t subperm(mappings.size());
-    while (true)
-    {
-        std::generate(subperm.begin(), subperm.end(), perm_generator());
-
-        subperm = solver_slots_[solver_index].solver(subtask, subperm);
-
-        const size_t sub_pos_removed = get_unfeasible_pos(subtask, subperm);
-        if (sub_pos_removed != subtask.size())
-        {
-            const size_t sub_job_removed = subperm[sub_pos_removed];
-            const size_t pos_removed = mappings[sub_job_removed];
-            const size_t job_removed = perm_[pos_removed];
-
-            mappings = shrink_perm(task_, mappings, job_removed);
-            //mappings.erase(mappings.begin() + sub_job_removed);
-            subtask.erase(subtask.begin() + sub_job_removed);
-            //subperm.erase(subperm.begin() + sub_pos_removed);
-            subperm = shrink_perm(subtask, subperm, sub_job_removed);
-
-            task_.erase(task_.begin() + job_removed);
-            //perm_.erase(perm_.begin() + pos_removed);
-            perm_ = shrink_perm(task_, perm_, job_removed);
-            --subtask_end_;
-
-            ++jobs_removed_;
-        }
-        else
-            break;
-    }
-
-    const sched_t subsched = perm2sched(subtask, subperm);
-
-    for (size_t i = subtask_begin_; i < subtask_end_; ++i)
-    {
-        perm_[i] = mappings[subperm[i - subtask_begin_]];
-        sched_[perm_[i]] = subsched[subperm[i - subtask_begin_]];
-    }
-
-    //perm_ = solver_slots_[i].solver(task_, perm_);
-    sched_.resize(task_.size());
-    updateCost();
-    const cost_t cost = get_cost_partial(task_, sched_, perm_, 0, subtask_end_);
-    solver_slots_[solver_index].lbl->setText(QString::number(cost));
-    scene_->invalidateItems();
-}*/
 
 void SchedDemo::updateOffset(size_t offset)
 {
@@ -241,93 +223,9 @@ void SchedDemo::updateTime()
 
 void SchedDemo::advanceSubtask()
 {
-    /*subtask_begin_ = std::min(task_.size(), subtask_begin_ + 1);
-    subtask_end_ = std::min(task_.size(), subtask_end_ + 1);
-    runSolver(selected_solver_);*/
-
-
-
     perm_.push_back(window_pos_);
-    sched_ = perm2sched(original_task_, perm_);
+    sched_ = perm2sched(task_, perm_);
     updateCost();
     ++window_pos_;
 }
-
-/*void SchedDemo::resetSubtask()
-{
-    task_ = original_task_;
-    perm_ = original_perm_;
-    jobs_removed_ = 0;
-    sched_ = perm2sched(task_, perm_);
-    subtask_begin_ = 0;
-    subtask_end_ = std::min<size_t>(task_.size(), 50);
-    runSolver(selected_solver_);
-    updateCost();
-}
-
-void SchedDemo::updateSubtask()
-{
-    size_t pos = 0;
-    for (; pos < task_.size(); ++pos)
-        //if (sched_[perm_[pos]] > window_pos_)
-        if (task_[perm_[pos]].due > window_pos_)
-            break;
-    const size_t begin = pos;
-
-    for (; pos < task_.size(); ++pos)
-        if (task_[perm_[pos]].due > window_pos_ + window_span_)
-            break;
-    const size_t end = pos;
-
-
-    qwt_demo_->setAxisScale(QwtPlot::xBottom, window_pos_ - 1, window_pos_ + window_span_ + 10);
-    qwt_demo_->replot();
-
-    if (begin != subtask_begin_ || end != subtask_end_)
-    {
-        subtask_begin_ = begin;
-        subtask_end_ = end;
-
-        scene_->setSubTask(subtask_begin_, subtask_end_);
-        runSolver(selected_solver_);
-        updateCost();
-    }
-}
-
-void SchedDemo::playDemo()
-{
-    play_timer_->start(100);
-}
-
-void SchedDemo::playTick()
-{
-    moment_t speed = (static_cast<moment_t>(speedBar_->value()) - static_cast<moment_t>(speedBar_->minimum())) / (static_cast<moment_t>(speedBar_->maximum()) - static_cast<moment_t>(speedBar_->minimum()));
-    speed *= 2;
-    window_pos_ += speed;
-
-    setWindowTitle("Jobs removed: " + QString::number(jobs_removed_));
-    
-    updateSubtask();
-}
-
-void SchedDemo::pauseDemo()
-{
-    play_timer_->stop();
-}
-
-void SchedDemo::resetDemo()
-{
-    window_pos_ = 0;
-    play_timer_->stop();
-    task_ = original_task_;
-    perm_ = original_perm_;
-    jobs_removed_ = 0;
-    updateSubtask();
-    scene_->invalidateItems();
-}
-
-void SchedDemo::deleteJob(const size_t pos)
-{
-
-}   */
 

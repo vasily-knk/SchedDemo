@@ -20,6 +20,9 @@ perm_t due_dates_solver(const task_t &task, const perm_t &src)
 
 perm_t random_solver(const task_t &t, const perm_t &src, size_t n_iters)
 {
+    if (src.empty())
+        return src;
+
     perm_t dst (src);
     int counter = 0;
     for (size_t iter = 0; iter < n_iters; ++iter)
@@ -42,6 +45,9 @@ perm_t random_solver(const task_t &t, const perm_t &src, size_t n_iters)
 
 perm_t all_pairs_solver(const task_t &t, const perm_t &src)
 {
+    if (src.empty())
+        return src;
+    
     perm_t dst (src);
     cost_t orig_cost = calculate_cost(t, src);
 

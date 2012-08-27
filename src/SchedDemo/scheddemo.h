@@ -3,6 +3,7 @@
 
 class SchedScene;
 class QwtSchedDemo;
+class qwt_demo_2;
 
 class SchedDemo : public QWidget
 {
@@ -20,8 +21,10 @@ public:
 
     void updateTime();
 
+private:
+    void runSolver();
 protected slots:
-    void runSolver(int i);
+    void setSolver(int i);
     void advanceSubtask();
      void playTick();
     void playDemo();
@@ -50,9 +53,12 @@ private:
     };
 private:
     const task_t original_task_;
+    task_t task_;
+    task_t fake_task_;
+    bool fake_task_selected_;
     //const perm_t original_perm_;
 
-    size_t jobs_removed_;
+    size_t jobs_processed_, jobs_removed_;
 
     //task_t task_;
 	perm_t perm_;
@@ -63,6 +69,8 @@ private:
 
     moment_t window_pos_, window_span_;
     size_t next_job_;
+    cost_t total_cost;
+    moment_t total_min_bound_;
 private:
 
     QTimer *play_timer_;
@@ -73,9 +81,10 @@ private:
 	//SchedScene *scene_;
     vector<solver_slot_t> solver_slots_;
     size_t selected_solver_;
-    QLabel *cost_display_;
+    QLabel *cost_display_, *processed_display_, *removed_display_, *in_progress_display_;
 
-    QwtSchedDemo *qwt_demo_;
+    //QwtSchedDemo *qwt_demo_;
+    qwt_demo_2 *demo2;
 
 
 };

@@ -152,5 +152,8 @@
     <ClInclude Include="qwt_aircraft.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\aircraft.h">
+      <Filter>common</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

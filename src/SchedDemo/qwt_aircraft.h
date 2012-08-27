@@ -8,5 +8,6 @@ public:
     ~qwt_aircraft(void);
 public:
     virtual void draw(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect ) const;
+    virtual QRectF boundingRect() const;
 };
 

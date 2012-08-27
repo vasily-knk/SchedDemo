@@ -224,6 +224,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\aircraft.h" />
     <ClInclude Include="..\common\common.h" />
     <ClInclude Include="..\common\task.h" />
     <CustomBuild Include="qwtscheddemo.h">
