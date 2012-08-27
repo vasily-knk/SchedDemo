@@ -8,9 +8,14 @@ perm_t order_solver(const task_t &t, const perm_t &/*src*/)
 }
 
 
-perm_t due_dates_solver(const task_t &t, const perm_t &/*src*/)
+perm_t due_dates_solver(const task_t &task, const perm_t &src)
 {
-    return due_dates_perm(t);
+    perm_t dst(src);
+    std::sort(dst.begin(), dst.end(), [&](size_t i, size_t j) -> bool
+    {
+        return (task[i].due < task[j].due);
+    });
+    return dst;
 }
 
 perm_t random_solver(const task_t &t, const perm_t &src, size_t n_iters)
@@ -19,8 +24,8 @@ perm_t random_solver(const task_t &t, const perm_t &src, size_t n_iters)
     int counter = 0;
     for (size_t iter = 0; iter < n_iters; ++iter)
     {
-        size_t i = rand() % (t.size() - 1);
-        size_t j = i + 1 + rand() % (t.size() - i - 1);
+        size_t i = rand() % (dst.size() - 1);
+        size_t j = i + 1 + rand() % (dst.size() - i - 1);
 
         cost_t before = calculate_cost(t, dst);
         std::swap(dst[i], dst[j]);
@@ -40,7 +45,6 @@ perm_t all_pairs_solver(const task_t &t, const perm_t &src)
     perm_t dst (src);
     cost_t orig_cost = calculate_cost(t, src);
 
-
     size_t best_i = 0, best_j = 0;
     cost_t best_cost = orig_cost;
 
@@ -49,9 +53,9 @@ perm_t all_pairs_solver(const task_t &t, const perm_t &src)
     for (iter = 0; success; ++iter)
     {
         success = false;
-        for (size_t i = 0; i < t.size()/* && !success*/; ++i)
+        for (size_t i = 0; i < dst.size()/* && !success*/; ++i)
         {
-            for (size_t j = i + 1; j < t.size()/* && !success*/; ++j)
+            for (size_t j = i + 1; j < dst.size()/* && !success*/; ++j)
             {
                 std::swap(dst[i], dst[j]);
                 const cost_t after = calculate_cost(t, dst);

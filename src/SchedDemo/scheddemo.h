@@ -22,12 +22,14 @@ public:
 
 protected slots:
     void runSolver(int i);
-    /*void reschedule();
     void advanceSubtask();
-    void resetSubtask();
+     void playTick();
     void playDemo();
     void pauseDemo();
     void resetDemo();
+    /*void reschedule();
+    void advanceSubtask();
+    void resetSubtask();
     void playTick();*/
 private:
     struct solver_slot_t
@@ -48,11 +50,11 @@ private:
     };
 private:
     const task_t original_task_;
-    const perm_t original_perm_;
+    //const perm_t original_perm_;
 
     size_t jobs_removed_;
 
-    task_t task_;
+    //task_t task_;
 	perm_t perm_;
 	sched_t sched_;
     //perm_t original_perm_, due_dates_perm_;
@@ -60,6 +62,7 @@ private:
     task_t deleted_jobs_;
 
     moment_t window_pos_, window_span_;
+    size_t next_job_;
 private:
 
     QTimer *play_timer_;
@@ -67,7 +70,7 @@ private:
     
     cost_t cost_;
 
-	SchedScene *scene_;
+	//SchedScene *scene_;
     vector<solver_slot_t> solver_slots_;
     size_t selected_solver_;
     QLabel *cost_display_;

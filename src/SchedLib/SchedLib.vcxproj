@@ -86,7 +86,10 @@
   <ItemGroup>
     <ClCompile Include="new_task_gen.cpp" />
     <ClCompile Include="perm2sched.cpp" />
-    <ClCompile Include="slow_perm2sched.cpp" />
+    <ClCompile Include="slow_perm2sched.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="slow_and_broken_perm2sched.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

@@ -12,6 +12,11 @@ using std::string;
 #include <boost/optional.hpp>
 using boost::optional;
 
+#include <boost/unordered_map.hpp>
+using boost::unordered_map;
+#include <boost/unordered_set.hpp>
+using boost::unordered_set;
+
 #include <map>
 using std::map;
 using std::multimap;

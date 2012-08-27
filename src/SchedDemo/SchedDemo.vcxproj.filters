@@ -109,6 +109,9 @@
     <ClCompile Include="qwt_aircraft.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="scheddemo_realtime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="scheddemo.qrc">

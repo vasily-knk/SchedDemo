@@ -34,29 +34,30 @@ namespace {
     perm2sched_context::perm2sched_context(const task_t &task, const perm_t &perm)
         : task(task)
         , perm(perm)
-        , sched(task.size())
     {
         assert (!task.empty());
-        assert (task.size() == perm.size());
     }
 
     const sched_t &perm2sched_context::calculate_sched()
     {
-        const size_t n = task.size();
+        //sched.resize(n, 0);
+        sched.clear();
 
-        sched.resize(n, 0);
+        if (perm.empty())
+            return sched;
+
         jobs_list.clear();
         offset = 0;
 
         add_last_job();
-        for (int pos = n - 2; pos >= 0; --pos)
+        for (int pos = perm.size() - 2; pos >= 0; --pos)
             add_job(pos);
 
-        for (size_t pos = 1; pos < n; ++pos)
+        for (size_t pos = 1; pos < perm.size(); ++pos)
         {
             const size_t job = perm[pos];
             const size_t prev_job = perm[pos - 1];
-            sched[job] = std::max<moment_t>(sched[prev_job] + get_processing_time(task, perm, pos - 1), sched[job]);
+            sched[job] = std::max<moment_t>(sched.at(prev_job) + get_processing_time(task, perm, pos - 1), sched.at(job));
         }
 
         return sched;
@@ -90,11 +91,11 @@ namespace {
         const size_t job = perm[pos];
         const size_t next_job = perm[pos + 1];
 
-        sched[job] = sched[next_job] - get_processing_time(task, perm, pos);
+        sched[job] = sched.at(next_job) - get_processing_time(task, perm, pos);
 
         max_push = std::min(max_push, task[job].max_bound - sched[job]);
 
-        if (sched[job] > task[job].due)
+        if (sched.at(job) > task[job].due)
             add_free_hanging_job(pos);
         else
             add_early_job(pos);
@@ -104,7 +105,7 @@ namespace {
     {
         const size_t job = perm[pos];
 
-        move_jobs_list(sched[job] - task[job].due);
+        move_jobs_list(sched.at(job) - task[job].due);
         insert_job(moment_t(0), task[job].tweight());
         sched[job] = task[job].due;
     }

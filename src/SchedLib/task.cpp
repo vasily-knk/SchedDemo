@@ -2,25 +2,25 @@
 
 cost_t get_cost(const task_t &task, const sched_t &sched)
 {
-    assert(task.size() == sched.size());
-
     cost_t cost = 0;
-    for (size_t i = 0; i < task.size(); ++i)
+    for (sched_t::const_iterator it = sched.begin(); it != sched.end(); ++it)
     {
-        if (sched[i] < task[i].min_bound || sched[i] > task[i].max_bound)
+        const size_t job = it->first;
+        const moment_t job_sched = it->second;
+        if (job_sched < task[job].min_bound || job_sched > task[job].max_bound)
             return std::numeric_limits<cost_t>::max();
 
-        const moment_t deviation = std::abs(sched[i] - task[i].due);
-        if (sched[i] - task[i].due > 0)
-            cost += task[i].tweight() * deviation;
+        const moment_t deviation = std::abs(job_sched - task[job].due);
+        if (job_sched - task[job].due > 0)
+            cost += task[job].tweight() * deviation;
         else
-            cost += task[i].eweight() * deviation;
+            cost += task[job].eweight() * deviation;
     }
     return cost;
 }
 
 
-cost_t get_cost_partial(const task_t &task, const sched_t &sched, const perm_t &perm, const size_t start, const size_t end)
+/*cost_t get_cost_partial(const task_t &task, const sched_t &sched, const perm_t &perm, const size_t start, const size_t end)
 {
     cost_t cost = 0;
     for (size_t pos = start; pos < end; ++pos)
@@ -37,7 +37,9 @@ cost_t get_cost_partial(const task_t &task, const sched_t &sched, const perm_t &
             cost += task[job].eweight() * deviation;
     }
     return cost;
-}
+}*/
+
+bool check_feasible(const task_t &task, const perm_t &perm);
 
 cost_t calculate_cost(const task_t &task, const perm_t &perm)
 {
@@ -49,26 +51,26 @@ cost_t calculate_cost(const task_t &task, const perm_t &perm)
 
 bool check_feasible(const task_t &task, const perm_t &perm)
 {
-    assert(task.size() == perm.size());
-    
     moment_t last = -std::numeric_limits<moment_t>::max();
     
-    sched_t sched(task.size());
-    for (size_t pos = 0; pos < task.size(); ++pos)
+    //sched_t sched();
+    for (size_t pos = 0; pos < perm.size(); ++pos)
     {
         const size_t job = perm[pos];
 
-        sched[job] = std::max(last, task[job].min_bound);
-        if (sched[job] > task[job].max_bound)
+        const moment_t job_sched = std::max(last, task[job].min_bound);
+
+        //sched[job] = std::max(last, task[job].min_bound);
+        if (job_sched > task[job].max_bound)
             return false;
 
-        last = sched[job] + get_processing_time(task, perm, pos);
+        last = job_sched + get_processing_time(task, perm, pos);
     }
     return true;
 
 }
 
-size_t get_unfeasible_pos(const task_t &task, const perm_t &perm)
+/*size_t get_unfeasible_pos(const task_t &task, const perm_t &perm)
 {
     assert(task.size() == perm.size());
 
@@ -86,7 +88,7 @@ size_t get_unfeasible_pos(const task_t &task, const perm_t &perm)
         last = sched[job] + get_processing_time(task, perm, pos);
     }
     return task.size();
-}
+}*/
 
 task_t apply_permutation(const task_t &task, const perm_t &perm)
 {
@@ -111,7 +113,7 @@ perm_t due_dates_perm(const task_t &t)
     return perm;
 }
 
-perm_t select_sub_task(const task_t &src_task, const sched_t &sched, const moment_t start, const moment_t end)
+/*perm_t select_sub_task(const task_t &src_task, const sched_t &sched, const moment_t start, const moment_t end)
 {
     perm_t mappings;
     
@@ -123,3 +125,4 @@ perm_t select_sub_task(const task_t &src_task, const sched_t &sched, const momen
 
     return mappings;
 }
+*/
