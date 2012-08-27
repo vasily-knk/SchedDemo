@@ -10,6 +10,7 @@ public:
     ~qwt_demo_2();
 public:
     void updateData(const task_t &task, const perm_t &perm, const sched_t &sched);
+    void updateMinBound(moment_t min_bound);
 private:
     class Histogram;
     void initGrid();
@@ -19,6 +20,7 @@ private:
     Histogram *yellow_lower_bounds, *yellow_upper_bounds, *yellow_aircrafts;
     Histogram *green_lower_bounds, *green_upper_bounds, *green_aircrafts;
     vector<QwtPlotMarker*> names;
+    QwtPlotMarker *min_bound_marker_;
     
 };
 

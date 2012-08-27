@@ -13,7 +13,7 @@
 #include <qwt_column_symbol.h>
 #include <qwt_series_data.h>
 #include <qwt_painter.h>
-
+#include <qwt_symbol.h>
 
 #include "../common/task.h"
 

@@ -21,11 +21,9 @@ SchedDemo::SchedDemo(const size_t num_planes, const moment_t timespan, const mom
     , total_cost(0)
 {
     resetDemo();
-    BOOST_FOREACH(job_t& job, fake_task_)
-    {
-        job.min_bound = job.due;
-    }
+
     sched_ = perm2sched(task_, perm_);
+    sched_src_ = perm2sched(task_src_, perm_);
 
 
 	
@@ -72,9 +70,10 @@ SchedDemo::SchedDemo(const size_t num_planes, const moment_t timespan, const mom
     connect(mapper, SIGNAL(mapped(int)), this, SLOT(setSolver(int)));
     
 
+/*
     QPushButton *advanceBtn = new QPushButton("Advance");
     sideLayout->addWidget(advanceBtn, solver_slots_.size() + 1, 0);
-    connect(advanceBtn, SIGNAL(clicked()), this, SLOT(advanceSubtask()));
+    connect(advanceBtn, SIGNAL(clicked()), this, SLOT(advanceSubtask()));*/
 
     /*QPushButton *resetBtn = new QPushButton("Reset");
     sideLayout->addWidget(resetBtn, solver_slots_.size() + 2, 0);
@@ -128,11 +127,15 @@ SchedDemo::SchedDemo(const size_t num_planes, const moment_t timespan, const mom
     layout->addWidget(qwt_demo_, 1, 0);
 */
 
-    layout->addWidget(sidePanel, 0, 1, 2, 1);
 
-    demo2 = new qwt_demo_2(NULL);
+    demo2_src = new qwt_demo_2(this);
+    demo2_src->setAxisScale(QwtPlot::xBottom, -30, 30);
+    demo2 = new qwt_demo_2(this);
     demo2->setAxisScale(QwtPlot::xBottom, -30, 30);
-    layout->addWidget(demo2, 1, 0);
+
+    layout->addWidget(demo2_src, 0, 0);
+    layout->addWidget(demo2, 0, 1);
+    layout->addWidget(sidePanel, 0, 3, 2, 1);
 
 	setLayout(layout);
     //scene_->invalidateItems();
@@ -153,7 +156,8 @@ void SchedDemo::updateCost()
     removed_display_->setText(QString::number(jobs_removed_));
     in_progress_display_->setText(QString::number(perm_.size()));
 
-    demo2->updateData(task_, perm_, sched_);
+    demo2->updateData(original_task_, perm_, sched_);
+    demo2_src->updateData(original_task_, perm_src_, sched_src_);
 }
 
 /*
@@ -171,37 +175,38 @@ perm_t shrink_perm(const task_t &, const perm_t &perm, const size_t removed_item
 }*/
 
 
-void SchedDemo::runSolver()
+void SchedDemo::runSolver(task_t &task, perm_t &perm, sched_t &sched)
 {
-    BOOST_FOREACH(size_t job, perm_)
+    BOOST_FOREACH(size_t job, perm)
     {
-        task_[job] = original_task_[job];
+        task[job] = original_task_[job];
         if (selected_solver_ == 0)
-            task_[job].min_bound = task_[job].due;
+            task[job].min_bound = task[job].due;
         else
         {
             
         }
-        task_[job].min_bound = std::max(task_[job].min_bound, total_min_bound_);
+        task[job].min_bound = std::max(task[job].min_bound, total_min_bound_);
+        task[job].due = std::max(task[job].due, task[job].min_bound);
     }
     
     if (solver_slots_[selected_solver_].solver == NULL)
         return;
 
-    perm_ = solver_slots_[selected_solver_].solver(task_, perm_);
+    perm = solver_slots_[selected_solver_].solver(task, perm);
     size_t job_to_remove;
-/*
-    while ((job_to_remove = get_unfeasible_pos(task_, perm_)) != perm_.size())
+
+    while ((job_to_remove = get_unfeasible_pos(task, perm)) != perm.size())
     {
-        perm_.erase(perm_.begin() + job_to_remove);
+        perm.erase(perm.begin() + job_to_remove);
         ++jobs_removed_;
-        perm_ = solver_slots_[selected_solver_].solver(task_, perm_);
+        perm = solver_slots_[selected_solver_].solver(task, perm);
     }
-*/
-    sched_ = perm2sched(task_, perm_);
+
+    sched = perm2sched(task, perm);
     
     updateCost();
-    const cost_t cost = get_cost(task_, sched_);
+    const cost_t cost = get_cost(task, sched);
     solver_slots_[selected_solver_].lbl->setText(QString::number(cost));
 }
 
@@ -219,13 +224,5 @@ void SchedDemo::updateOffset(size_t offset)
 
 void SchedDemo::updateTime()
 {
-}
-
-void SchedDemo::advanceSubtask()
-{
-    perm_.push_back(window_pos_);
-    sched_ = perm2sched(task_, perm_);
-    updateCost();
-    ++window_pos_;
 }
 

@@ -15,17 +15,17 @@ public:
 
 	void updateCost();
     void updateOffset(size_t offset);
-    void updateSubtask();
+    void updateSubtask(task_t &task, perm_t &perm, sched_t &sched, size_t &next_job, size_t slv);
 
     void deleteJob(size_t pos);
 
     void updateTime();
 
 private:
-    void runSolver();
+    void runSolver(task_t &task, perm_t &perm, sched_t &sched);
 protected slots:
     void setSolver(int i);
-    void advanceSubtask();
+    //void advanceSubtask();
      void playTick();
     void playDemo();
     void pauseDemo();
@@ -53,22 +53,18 @@ private:
     };
 private:
     const task_t original_task_;
-    task_t task_;
-    task_t fake_task_;
+    task_t task_, task_src_;
+    perm_t perm_, perm_src_;
+    sched_t sched_, sched_src_;
     bool fake_task_selected_;
     //const perm_t original_perm_;
 
     size_t jobs_processed_, jobs_removed_;
 
-    //task_t task_;
-	perm_t perm_;
-	sched_t sched_;
-    //perm_t original_perm_, due_dates_perm_;
-
     task_t deleted_jobs_;
 
     moment_t window_pos_, window_span_;
-    size_t next_job_;
+    size_t next_job_, next_job_src_;
     cost_t total_cost;
     moment_t total_min_bound_;
 private:
@@ -85,6 +81,7 @@ private:
 
     //QwtSchedDemo *qwt_demo_;
     qwt_demo_2 *demo2;
+    qwt_demo_2 *demo2_src;
 
 
 };

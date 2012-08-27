@@ -64,6 +64,12 @@ qwt_demo_2::qwt_demo_2(QWidget *parent)
         names[i]->setLabelAlignment(Qt::AlignRight);
         names[i]->attach(this);
     }
+
+    QwtSymbol *sym = new QwtSymbol(QwtSymbol::HLine, QBrush(Qt::red), QPen(Qt::red), QSize(-100,100));
+    min_bound_marker_ = new QwtPlotMarker;
+    min_bound_marker_->setSymbol(sym);
+    min_bound_marker_->attach(this);
+
     initGrid();
 }
 
@@ -154,6 +160,11 @@ void qwt_demo_2::initGrid()
     grid->setMajPen(QPen(Qt::black, 0, Qt::DotLine));
     grid->attach(this);
 
+}
+
+void qwt_demo_2::updateMinBound(moment_t min_bound)
+{
+    min_bound_marker_->setYValue(min_bound);
 }
 
 
